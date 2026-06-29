@@ -10,6 +10,9 @@
 #endif
 
 #include "ICameraFactory.h"
+#if defined(EUZEBIA3D_DEBUG_MODE)
+#include "IDebugMode.h"
+#endif
 #include "IDisplay.h"
 #include "IHardware.h"
 #include "ILightFactory.h"
@@ -20,6 +23,9 @@
 #include "IPuppeteer.h"
 
 #include "cameraFactory.h"
+#if defined(EUZEBIA3D_DEBUG_MODE)
+#include "debugMode.h"
+#endif
 #include "lightFactory.h"
 #include "meshFactory.h"
 #include "renderer.h"
@@ -45,6 +51,9 @@ static const ILightFactory *lightFactory;
 static const ICameraFactory *cameraFactory;
 static const IStorage *storage;
 static const IPuppeteer *puppeteer;
+#if defined(EUZEBIA3D_DEBUG_MODE)
+static const IDebugMode *debugMode;
+#endif
 
 #if defined(EUZEBIA3D_PLATFORM_WINDOWS)
 #define EUZEBIA3D_WINDOWS_TARGET_FPS 24u
@@ -94,10 +103,10 @@ static void cap_window_frame_rate(uint64_t frame_begin_ticks)
     }
 
     uint64_t remaining_ticks = target_frame_ticks - elapsed_ticks;
-    uint64_t remaining_ms = (remaining_ticks * 1000u) / performance_frequency;
-    if (remaining_ms > 0u)
+    uint64_t remaining_ns = (remaining_ticks * 1000000000ull) / performance_frequency;
+    if (remaining_ns > 0u)
     {
-        SDL_Delay((uint32_t)remaining_ms);
+        SDL_DelayPrecise(remaining_ns);
     }
 }
 #endif
@@ -114,7 +123,7 @@ int main(void)
 #endif
 
 #if defined(PLATFORM_PICO)
-    set_sys_clock_khz(300000, true);
+    set_sys_clock_khz(320000, true);
 
     hardware_core = get_hardware();
     hardware_core->init_hardware();
@@ -141,6 +150,17 @@ int main(void)
     }
 #endif
     painter->init_painter(display, hardware_core, storage);
+
+#if defined(EUZEBIA3D_DEBUG_MODE)
+    debugMode = get_debugMode();
+#if defined(EUZEBIA3D_PLATFORM_WINDOWS)
+    if (!require_pointer(debugMode, "get_debugMode"))
+    {
+        return 1;
+    }
+#endif
+    debugMode->init_debug_mode(hardware_core, painter);
+#endif
 
     renderer = get_renderer();
 #if defined(PLATFORM_WINDOWS)
@@ -281,7 +301,7 @@ int main(void)
         .height = 10,
         .width = 280,
     };
-    char *text = "PILNE: Ministerstwo Grabi i Widel uspokaja, ze tegoroczny wysyp kabaczkuf nie zagraza bespieczenstwu panstwa...";// Rolnicy z gminy Dolne Pole donoszo, ze kombajn pana Zdzislawa sam odmuwil pracy i zazondal urlopu pod gruszom... Ceny marchwi so stabilne, ale eksperty ostrzegajo przed panikom wsrod krolikuf... Na rynku zboz lekkie poruszenie po tym, jak pszenica ozima zaczela zadawac niewygodne pytania o sens rzycia... Kolo Gospodyn Wiejskich zapowiada nowom technologie kiszenia ogurkuf w chmurze, choc starsze mieszkance nadal wolo beczke, bo przynajmniej nie wymaga aktualizaci... Wedlug raportu Instytutu Spraw Slomianych az 73 procent strachuf na wroble czuje sie nie docenionych i rozwaza kariere influenseruf pogodowych... W powiecie ziemniaczanym wykryto podejzanie okronglego buraka, sprawe bada komisja do spraw warzyw geometrycznie nie pokojoncych... Hodofcy kur apelujo o cisze nocnom po tym, jak jeden kogut przeszedl na tryb alarmu 24/7 i zaczol piac takrze w formacie stereo... Prognozy dla rolnictwa so umiarkowanie optymistyczne: bedzie padac, nie bedzie padac albo bedzie padac wtedy, kiedy nikt o to nie prosil... Gielda nawozuf zakonczyla dzien lekkim smrodem, ale analityki twierdzo, ze to naturalna korekcja rynku... W sadach rozpoczeto testy inteligentnych jablek, kture same spadajo do skrzynki, ale tylko po zaakceptowaniu regulaminu... Agencja Restrukturyzaci i Modernizaci Grzondek przypomina, ze wnioski o doplaty do samotnych poruf nalezy skladac do piontku, chyba ze por ma juz wsparcie rodziny... Lokalny soltys zdementowal plotki, jakoby traktor marki Ursus zostal widziany na randce z przyczepom samozbierajoncom... Na koniec przypominamy: kto sieje wiatr, ten zbiera kontrole z urzendu, a kto sieje rzepak, ten przynajmniej wie, po co wstal o czwartej rano.";
+    char *text = "PILNE: Ministerstwo Grabi i Widel uspokaja, ze tegoroczny wysyp kabaczkuf nie zagraza bespieczenstwu panstwa... Rolnicy z gminy Dolne Pole donoszo, ze kombajn pana Zdzislawa sam odmuwil pracy i zazondal urlopu pod gruszom... Ceny marchwi so stabilne, ale eksperty ostrzegajo przed panikom wsrod krolikuf..."; // Na rynku zboz lekkie poruszenie po tym, jak pszenica ozima zaczela zadawac niewygodne pytania o sens rzycia... Kolo Gospodyn Wiejskich zapowiada nowom technologie kiszenia ogurkuf w chmurze, choc starsze mieszkance nadal wolo beczke, bo przynajmniej nie wymaga aktualizaci... Wedlug raportu Instytutu Spraw Slomianych az 73 procent strachuf na wroble czuje sie nie docenionych i rozwaza kariere influenseruf pogodowych... W powiecie ziemniaczanym wykryto podejzanie okronglego buraka, sprawe bada komisja do spraw warzyw geometrycznie nie pokojoncych... Hodofcy kur apelujo o cisze nocnom po tym, jak jeden kogut przeszedl na tryb alarmu 24/7 i zaczol piac takrze w formacie stereo... Prognozy dla rolnictwa so umiarkowanie optymistyczne: bedzie padac, nie bedzie padac albo bedzie padac wtedy, kiedy nikt o to nie prosil... Gielda nawozuf zakonczyla dzien lekkim smrodem, ale analityki twierdzo, ze to naturalna korekcja rynku... W sadach rozpoczeto testy inteligentnych jablek, kture same spadajo do skrzynki, ale tylko po zaakceptowaniu regulaminu... Agencja Restrukturyzaci i Modernizaci Grzondek przypomina, ze wnioski o doplaty do samotnych poruf nalezy skladac do piontku, chyba ze por ma juz wsparcie rodziny... Lokalny soltys zdementowal plotki, jakoby traktor marki Ursus zostal widziany na randce z przyczepom samozbierajoncom... Na koniec przypominamy: kto sieje wiatr, ten zbiera kontrole z urzendu, a kto sieje rzepak, ten przynajmniej wie, po co wstal o czwartej rano.";
     //
     uint32_t t = 0;
     uint8_t scene = 0;
@@ -290,12 +310,12 @@ int main(void)
     int running = 1;
     while (running)
     {
-        uint64_t frame_begin_ticks = SDL_GetPerformanceCounter();
-
-        running = process_window_events();
 #else
     while (1)
     {
+#if defined(EUZEBIA3D_DEBUG_MODE)
+        debugMode->begin_frame();
+#endif
 #endif
         painter->clear_buffer(10);
         if (scene < 2)
@@ -331,7 +351,7 @@ int main(void)
             painter->draw_sprite(weather_5_2, 178, 140, 0, 1);
             painter->draw_sprite(weather_5_3, 244, 124, 0, 1);
             puppeteer->perform(pogodynka, t);
-            if (t - scene_start_t <= 10)
+            if (t - scene_start_t <= 5)
             {
                 painter->draw_sprite(segment_numbers[0], 56, 36, 0, 2);
                 painter->draw_sprite(segment_numbers[1], 76, 36, 0, 2);
@@ -371,7 +391,14 @@ int main(void)
         }
         float qt = t * 0.02f;
         (void)qt;
+#if defined(EUZEBIA3D_DEBUG_MODE)
+        debugMode->show_info();
+        debugMode->begin_draw_buffer();
+#endif
         painter->draw_buffer();
+#if defined(EUZEBIA3D_DEBUG_MODE)
+        debugMode->end_draw_buffer();
+#endif
         t++;
         if (t % 60 == 0)
         {
@@ -394,8 +421,9 @@ int main(void)
                 running = 0;
             }
         }
-
-        cap_window_frame_rate(frame_begin_ticks);
+#endif
+#if defined(EUZEBIA3D_DEBUG_MODE)
+        debugMode->end_frame();
 #endif
     }
 

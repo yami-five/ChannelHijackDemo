@@ -13,6 +13,8 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+option(DEBUG_MODE "Show metrics on the display" ON)
+
 if(CHANNELHIJACK_PLATFORM_NORMALIZED STREQUAL "PICO")
     # Initialise pico_sdk from installed location
     # (note this can come from environment, CMake cache etc)
@@ -80,7 +82,7 @@ set(EUZEBIA3D_BUILD_APP OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     Euzebia3D
     GIT_REPOSITORY https://github.com/yami-five/Euzebia3D.git
-    GIT_TAG        v0.8.6
+    GIT_TAG        v0.9.0
 )
 FetchContent_MakeAvailable(Euzebia3D)
 
@@ -96,6 +98,9 @@ target_include_directories(ChannelHijackDemo PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
 target_link_libraries(ChannelHijackDemo PRIVATE Euzebia3D_libs)
+if(DEBUG_MODE)
+    target_compile_definitions(ChannelHijackDemo PRIVATE EUZEBIA3D_DEBUG_MODE=1)
+endif()
 
 if(CHANNELHIJACK_PLATFORM_NORMALIZED STREQUAL "PICO")
     target_compile_definitions(ChannelHijackDemo PRIVATE PLATFORM_PICO=1)
