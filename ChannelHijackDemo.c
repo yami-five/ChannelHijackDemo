@@ -266,8 +266,8 @@ int main(void)
     Rectangle plasmaRect = {
         .x = 28,
         .y = 44,
-        .height = 181,
-        .width = 241,
+        .height = 182,
+        .width = 242,
     };
     Rectangle bar1 = {
         .x = 15,
@@ -281,7 +281,7 @@ int main(void)
         .height = 10,
         .width = 280,
     };
-    char *text = "PILNE: Ministerstwo Grabi i Widel uspokaja, ze tegoroczny wysyp kabaczkuf nie zagraza bespieczenstwu panstwa... Rolnicy z gminy Dolne Pole donoszo, ze kombajn pana Zdzislawa sam odmuwil pracy i zazondal urlopu pod gruszom... Ceny marchwi so stabilne, ale eksperty ostrzegajo przed panikom wsrod krolikuf... Na rynku zboz lekkie poruszenie po tym, jak pszenica ozima zaczela zadawac niewygodne pytania o sens rzycia... Kolo Gospodyn Wiejskich zapowiada nowom technologie kiszenia ogurkuf w chmurze, choc starsze mieszkance nadal wolo beczke, bo przynajmniej nie wymaga aktualizaci... Wedlug raportu Instytutu Spraw Slomianych az 73 procent strachuf na wroble czuje sie nie docenionych i rozwaza kariere influenseruf pogodowych... W powiecie ziemniaczanym wykryto podejzanie okronglego buraka, sprawe bada komisja do spraw warzyw geometrycznie nie pokojoncych... Hodofcy kur apelujo o cisze nocnom po tym, jak jeden kogut przeszedl na tryb alarmu 24/7 i zaczol piac takrze w formacie stereo... Prognozy dla rolnictwa so umiarkowanie optymistyczne: bedzie padac, nie bedzie padac albo bedzie padac wtedy, kiedy nikt o to nie prosil... Gielda nawozuf zakonczyla dzien lekkim smrodem, ale analityki twierdzo, ze to naturalna korekcja rynku... W sadach rozpoczeto testy inteligentnych jablek, kture same spadajo do skrzynki, ale tylko po zaakceptowaniu regulaminu... Agencja Restrukturyzaci i Modernizaci Grzondek przypomina, ze wnioski o doplaty do samotnych poruf nalezy skladac do piontku, chyba ze por ma juz wsparcie rodziny... Lokalny soltys zdementowal plotki, jakoby traktor marki Ursus zostal widziany na randce z przyczepom samozbierajoncom... Na koniec przypominamy: kto sieje wiatr, ten zbiera kontrole z urzendu, a kto sieje rzepak, ten przynajmniej wie, po co wstal o czwartej rano.";
+    char *text = "PILNE: Ministerstwo Grabi i Widel uspokaja, ze tegoroczny wysyp kabaczkuf nie zagraza bespieczenstwu panstwa...";// Rolnicy z gminy Dolne Pole donoszo, ze kombajn pana Zdzislawa sam odmuwil pracy i zazondal urlopu pod gruszom... Ceny marchwi so stabilne, ale eksperty ostrzegajo przed panikom wsrod krolikuf... Na rynku zboz lekkie poruszenie po tym, jak pszenica ozima zaczela zadawac niewygodne pytania o sens rzycia... Kolo Gospodyn Wiejskich zapowiada nowom technologie kiszenia ogurkuf w chmurze, choc starsze mieszkance nadal wolo beczke, bo przynajmniej nie wymaga aktualizaci... Wedlug raportu Instytutu Spraw Slomianych az 73 procent strachuf na wroble czuje sie nie docenionych i rozwaza kariere influenseruf pogodowych... W powiecie ziemniaczanym wykryto podejzanie okronglego buraka, sprawe bada komisja do spraw warzyw geometrycznie nie pokojoncych... Hodofcy kur apelujo o cisze nocnom po tym, jak jeden kogut przeszedl na tryb alarmu 24/7 i zaczol piac takrze w formacie stereo... Prognozy dla rolnictwa so umiarkowanie optymistyczne: bedzie padac, nie bedzie padac albo bedzie padac wtedy, kiedy nikt o to nie prosil... Gielda nawozuf zakonczyla dzien lekkim smrodem, ale analityki twierdzo, ze to naturalna korekcja rynku... W sadach rozpoczeto testy inteligentnych jablek, kture same spadajo do skrzynki, ale tylko po zaakceptowaniu regulaminu... Agencja Restrukturyzaci i Modernizaci Grzondek przypomina, ze wnioski o doplaty do samotnych poruf nalezy skladac do piontku, chyba ze por ma juz wsparcie rodziny... Lokalny soltys zdementowal plotki, jakoby traktor marki Ursus zostal widziany na randce z przyczepom samozbierajoncom... Na koniec przypominamy: kto sieje wiatr, ten zbiera kontrole z urzendu, a kto sieje rzepak, ten przynajmniej wie, po co wstal o czwartej rano.";
     //
     uint32_t t = 0;
     uint8_t scene = 0;
@@ -340,7 +340,7 @@ int main(void)
         else if (scene == 1)
         {
             // news
-            painter->draw_plasma(plasmaColors, 16, t, 7, 7, 8, 7, &plasmaRect);
+            painter->draw_plasma(plasmaColors, 16, t, 2, 6, 6, 7, 6, &plasmaRect);
             painter->draw_sprite(agro_main, 130, 44, 0, 1);
             painter->draw_sprite(burak, 54, 38, 0, 1);
             painter->draw_rectangle(&bar1, 0x34b2);
