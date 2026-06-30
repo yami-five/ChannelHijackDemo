@@ -35,6 +35,8 @@
 #include "puppeteer.h"
 #include "puppet.h"
 
+#include "ChannelHijackDemoHelpers.h"
+
 #if defined(PLATFORM_PICO)
 #include "display.h"
 #include "hardware.h"
@@ -53,62 +55,6 @@ static const IStorage *storage;
 static const IPuppeteer *puppeteer;
 #if defined(EUZEBIA3D_DEBUG_MODE)
 static const IDebugMode *debugMode;
-#endif
-
-#if defined(EUZEBIA3D_PLATFORM_WINDOWS)
-#define EUZEBIA3D_WINDOWS_TARGET_FPS 24u
-
-static int require_pointer(const void *pointer, const char *name)
-{
-    if (pointer != NULL)
-    {
-        return 1;
-    }
-
-    SDL_Log("%s failed", name);
-    return 0;
-}
-
-static int process_window_events(void)
-{
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-        if (event.type == SDL_EVENT_QUIT)
-        {
-            return 0;
-        }
-        if (event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_ESCAPE)
-        {
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-static void cap_window_frame_rate(uint64_t frame_begin_ticks)
-{
-    uint64_t performance_frequency = SDL_GetPerformanceFrequency();
-    if (performance_frequency == 0u || EUZEBIA3D_WINDOWS_TARGET_FPS == 0u)
-    {
-        return;
-    }
-
-    uint64_t target_frame_ticks = performance_frequency / EUZEBIA3D_WINDOWS_TARGET_FPS;
-    uint64_t elapsed_ticks = SDL_GetPerformanceCounter() - frame_begin_ticks;
-    if (elapsed_ticks >= target_frame_ticks)
-    {
-        return;
-    }
-
-    uint64_t remaining_ticks = target_frame_ticks - elapsed_ticks;
-    uint64_t remaining_ns = (remaining_ticks * 1000000000ull) / performance_frequency;
-    if (remaining_ns > 0u)
-    {
-        SDL_DelayPrecise(remaining_ns);
-    }
-}
 #endif
 
 #if defined(PLATFORM_WINDOWS)
@@ -153,7 +99,7 @@ int main(void)
 
 #if defined(EUZEBIA3D_DEBUG_MODE)
     debugMode = get_debugMode();
-#if defined(EUZEBIA3D_PLATFORM_WINDOWS)
+#if defined(PLATFORM_WINDOWS)
     if (!require_pointer(debugMode, "get_debugMode"))
     {
         return 1;
@@ -264,6 +210,12 @@ int main(void)
     // tv
     const Sprite *channel1 = storage->get_sprite(34);
     const Sprite *channel2 = storage->get_sprite(35);
+#define curtainLen 20
+    Sprite *curtain[curtainLen];
+    for (uint8_t i = 0; i < curtainLen; i++)
+    {
+        curtain[i] = storage->get_sprite(36);
+    }
 
     uint16_t plasmaColors[16] = {
         0x1be6,
@@ -310,6 +262,7 @@ int main(void)
     int running = 1;
     while (running)
     {
+        uint64_t frame_begin_ticks = SDL_GetPerformanceCounter();
 #else
     while (1)
     {
@@ -318,7 +271,7 @@ int main(void)
 #endif
 #endif
         painter->clear_buffer(10);
-        if (scene < 2)
+        if (scene < 3)
             // tv zoom in
             painter->draw_background(tv_big_background);
         else
@@ -376,17 +329,24 @@ int main(void)
         }
         else if (scene == 2)
         {
-            painter->draw_sprite(channel1, 91, 76, 0, 1);
+            draw_grid(painter, 44, 120, 120, 240, 0xfafa, 8, 200, 0, 0, t, 0);
+            draw_grid(painter, 44, 31, 89, 240, 0xfafa, 8, 200, 0, 0, t, 1);
         }
-        else
+        else if (scene == 3)
+        {
+            painter->draw_sprite(channel1, 91, 76, 0, 1);
+            animate_curtain(painter, curtain, t, curtainLen);
+        }
+        else if (scene == 4)
         {
             painter->draw_sprite(channel2, 91, 76, 0, 1);
+            animate_curtain(painter, curtain, t, curtainLen);
         }
-        if (scene < 2)
+        if (scene < 3)
         {
             // tv frame
             painter->draw_sprite(tv_big_frame1, 272, 20, 0, 1);
-            painter->draw_sprite(tv_big_frame2, 44, 31, 0, 1);
+            painter->draw_sprite(tv_big_frame2, 44, 30, 0, 1);
             painter->draw_sprite(tv_big_frame3, 0, 169, 0, 1);
         }
         float qt = t * 0.02f;
@@ -403,7 +363,7 @@ int main(void)
         if (t % 60 == 0)
         {
             scene++;
-            if (scene > 3)
+            if (scene > 4)
                 scene = 0;
             scene_start_t = t + 1;
         }
@@ -421,6 +381,8 @@ int main(void)
                 running = 0;
             }
         }
+
+        cap_window_frame_rate(frame_begin_ticks);
 #endif
 #if defined(EUZEBIA3D_DEBUG_MODE)
         debugMode->end_frame();

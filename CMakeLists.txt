@@ -57,14 +57,27 @@ if(CHANNELHIJACK_PLATFORM_NORMALIZED STREQUAL "WINDOWS")
     set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
     set(SDL_SHARED ON CACHE BOOL "" FORCE)
     set(SDL_STATIC OFF CACHE BOOL "" FORCE)
-    FetchContent_Declare(
-        SDL3
-        GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-        GIT_TAG        main
-    )
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.24")
+        FetchContent_Declare(
+            SDL3
+            GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+            GIT_TAG        main
+            OVERRIDE_FIND_PACKAGE
+        )
+    else()
+        FetchContent_Declare(
+            SDL3
+            GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+            GIT_TAG        main
+        )
+    endif()
     FetchContent_MakeAvailable(SDL3)
-    FetchContent_GetProperties(SDL3)
-    if(EXISTS "${sdl3_BINARY_DIR}/SDL3Config.cmake")
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.24")
+        unset(SDL3_DIR CACHE)
+    else()
+        FetchContent_GetProperties(SDL3)
+    endif()
+    if(CMAKE_VERSION VERSION_LESS "3.24" AND EXISTS "${sdl3_BINARY_DIR}/SDL3Config.cmake")
         set(SDL3_DIR "${sdl3_BINARY_DIR}" CACHE PATH "Path to SDL3Config.cmake" FORCE)
         list(PREPEND CMAKE_PREFIX_PATH "${sdl3_BINARY_DIR}")
     endif()
@@ -82,7 +95,7 @@ set(EUZEBIA3D_BUILD_APP OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     Euzebia3D
     GIT_REPOSITORY https://github.com/yami-five/Euzebia3D.git
-    GIT_TAG        v0.9.0
+    GIT_TAG        v0.9.1
 )
 FetchContent_MakeAvailable(Euzebia3D)
 
@@ -93,7 +106,10 @@ if(TARGET Euzebia3D_Storage)
     target_include_directories(Euzebia3D_Storage PUBLIC "${CHANNELHIJACK_STORAGE_DIR}")
 endif()
 
-add_executable(ChannelHijackDemo ChannelHijackDemo.c)
+add_executable(ChannelHijackDemo
+        ChannelHijackDemo.c
+        ChannelHijackDemoHelpers.c
+)
 target_include_directories(ChannelHijackDemo PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
