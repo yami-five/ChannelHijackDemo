@@ -35,6 +35,8 @@
 #include "puppeteer.h"
 #include "puppet.h"
 
+#include "fpa.h"
+
 #include "ChannelHijackDemoHelpers.h"
 
 #if defined(PLATFORM_PICO)
@@ -43,6 +45,12 @@
 #endif
 
 const IPainter *get_painter(void);
+
+static int16_t wave_offset(uint32_t t, uint16_t speed, uint32_t phase, int16_t amplitude)
+{
+    uint32_t wave_phase = (((t % TABLE_SIZE) * (uint32_t)speed) + phase) % TABLE_SIZE;
+    return (int16_t)(((int32_t)fast_sin((int32_t)wave_phase) * amplitude) >> 10);
+}
 
 static const IHardware *hardware_core;
 static const IDisplay *display;
@@ -211,13 +219,22 @@ int main(void)
     const Sprite *channel1 = storage->get_sprite(34);
     const Sprite *channel2 = storage->get_sprite(35);
 #define curtainLen 20
-    Sprite *curtain[curtainLen];
+    static Sprite *curtain[curtainLen];
     for (uint8_t i = 0; i < curtainLen; i++)
     {
         curtain[i] = storage->get_sprite(36);
     }
-
-    uint16_t plasmaColors[16] = {
+    Sprite *leftHands[7];
+    for (uint8_t i = 0; i < 7; i++)
+    {
+        leftHands[i] = storage->get_sprite(37 + i);
+    }
+    Sprite *rightHands[5];
+    for (uint8_t i = 0; i < 5; i++)
+    {
+        rightHands[i] = storage->get_sprite(44 + i);
+    }
+    static uint16_t plasmaColors[16] = {
         0x1be6,
         0x2427,
         0x3447,
@@ -235,29 +252,36 @@ int main(void)
         0x2427,
         0x1be6,
     };
-    Rectangle plasmaRect = {
+    static Rectangle plasmaRect = {
         .x = 28,
         .y = 44,
         .height = 182,
         .width = 242,
     };
-    Rectangle bar1 = {
+    static Rectangle bar1 = {
         .x = 15,
         .y = 38,
         .height = 20,
         .width = 280,
     };
-    Rectangle bar2 = {
+    static Rectangle bar2 = {
         .x = 15,
         .y = 28,
         .height = 10,
         .width = 280,
+    };
+    static Rectangle rect = {
+        .x = 44,
+        .y = 28,
+        .height = 182,
+        .width = 242,
     };
     char *text = "PILNE: Ministerstwo Grabi i Widel uspokaja, ze tegoroczny wysyp kabaczkuf nie zagraza bespieczenstwu panstwa... Rolnicy z gminy Dolne Pole donoszo, ze kombajn pana Zdzislawa sam odmuwil pracy i zazondal urlopu pod gruszom... Ceny marchwi so stabilne, ale eksperty ostrzegajo przed panikom wsrod krolikuf..."; // Na rynku zboz lekkie poruszenie po tym, jak pszenica ozima zaczela zadawac niewygodne pytania o sens rzycia... Kolo Gospodyn Wiejskich zapowiada nowom technologie kiszenia ogurkuf w chmurze, choc starsze mieszkance nadal wolo beczke, bo przynajmniej nie wymaga aktualizaci... Wedlug raportu Instytutu Spraw Slomianych az 73 procent strachuf na wroble czuje sie nie docenionych i rozwaza kariere influenseruf pogodowych... W powiecie ziemniaczanym wykryto podejzanie okronglego buraka, sprawe bada komisja do spraw warzyw geometrycznie nie pokojoncych... Hodofcy kur apelujo o cisze nocnom po tym, jak jeden kogut przeszedl na tryb alarmu 24/7 i zaczol piac takrze w formacie stereo... Prognozy dla rolnictwa so umiarkowanie optymistyczne: bedzie padac, nie bedzie padac albo bedzie padac wtedy, kiedy nikt o to nie prosil... Gielda nawozuf zakonczyla dzien lekkim smrodem, ale analityki twierdzo, ze to naturalna korekcja rynku... W sadach rozpoczeto testy inteligentnych jablek, kture same spadajo do skrzynki, ale tylko po zaakceptowaniu regulaminu... Agencja Restrukturyzaci i Modernizaci Grzondek przypomina, ze wnioski o doplaty do samotnych poruf nalezy skladac do piontku, chyba ze por ma juz wsparcie rodziny... Lokalny soltys zdementowal plotki, jakoby traktor marki Ursus zostal widziany na randce z przyczepom samozbierajoncom... Na koniec przypominamy: kto sieje wiatr, ten zbiera kontrole z urzendu, a kto sieje rzepak, ten przynajmniej wie, po co wstal o czwartej rano.";
     //
     uint32_t t = 0;
     uint8_t scene = 0;
     uint32_t scene_start_t = t;
+    uint32_t first_scene_end = 120;
 #if defined(PLATFORM_WINDOWS)
     int running = 1;
     while (running)
@@ -271,13 +295,60 @@ int main(void)
 #endif
 #endif
         painter->clear_buffer(10);
-        if (scene < 3)
+        if (scene != 0 && scene != 3 && scene != 5)
             // tv zoom in
             painter->draw_background(tv_big_background);
         else
             // tv zoom out
             painter->draw_background(tv_background);
         if (scene == 0)
+        {
+            if (t > first_scene_end - 70)
+            {
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
+                if (t > (first_scene_end - 60) + 45 && t <= (first_scene_end - 60) + 55)
+                    painter->draw_sprite(leftHands[6], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
+                else
+                    painter->draw_sprite(leftHands[5], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
+            }
+            else if(t<scene_start_t+20)
+            {
+                painter->draw_sprite(leftHands[0], 0, 244 - (t-scene_start_t)* 7, 0, 1);
+                painter->draw_sprite(rightHands[0], 168, 204 - (t - scene_start_t) * 7, 0, 1);
+            }
+            else if (t < scene_start_t + 30)
+            {
+                painter->draw_sprite(leftHands[1], -1, 78, 0, 1);
+                painter->draw_sprite(rightHands[1], 160, 112, 0, 1);
+            }
+            else if (t < scene_start_t + 40)
+            {
+                painter->draw_sprite(leftHands[2], 0, 78, 0, 1);
+                painter->draw_sprite(rightHands[2], 167, 89, 0, 1);
+            }
+            else if (t < scene_start_t + 50)
+            {
+                painter->draw_sprite(leftHands[0], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
+            }
+            else if (t < scene_start_t + 70)
+            {
+                painter->draw_sprite(leftHands[0], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
+            }
+        }
+        else if (scene == 1)
+        {
+            painter->draw_rectangle(&rect, 0x1c03);
+            draw_grid(painter, 44, 120, 120, 240, 0x7f4f, 8, 200, 0, 0, t, 0);
+            painter->print("PROGRAM WIECZORNY", 64, 38, 0, 0xffff);
+            if (t - scene_start_t <= 15)
+            {
+                painter->draw_sprite(segment_numbers[0], 56, 36, 0, 2);
+                painter->draw_sprite(segment_numbers[1], 76, 36, 0, 2);
+            }
+        }
+        else if (scene == 2)
         {
             // weather report
             painter->draw_sprite(map, 44, 1, 0, 1);
@@ -304,13 +375,23 @@ int main(void)
             painter->draw_sprite(weather_5_2, 178, 140, 0, 1);
             painter->draw_sprite(weather_5_3, 244, 124, 0, 1);
             puppeteer->perform(pogodynka, t);
-            if (t - scene_start_t <= 5)
+            if (t - scene_start_t <= 15)
             {
                 painter->draw_sprite(segment_numbers[0], 56, 36, 0, 2);
-                painter->draw_sprite(segment_numbers[1], 76, 36, 0, 2);
+                painter->draw_sprite(segment_numbers[2], 76, 36, 0, 2);
             }
         }
-        else if (scene == 1)
+        else if (scene == 3)
+        {
+            painter->draw_sprite(channel1, 91, 76, 0, 1);
+            animate_curtain(painter, curtain, t, curtainLen);
+            painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
+            if (t > scene_start_t + 45 && t <= scene_start_t + 55)
+                painter->draw_sprite(leftHands[4], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
+            else
+                painter->draw_sprite(leftHands[3], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
+        }
+        else if (scene == 4)
         {
             // news
             painter->draw_plasma(plasmaColors, 16, t, 2, 6, 6, 7, 6, &plasmaRect);
@@ -321,28 +402,23 @@ int main(void)
             painter->print(text, 0 - (t * 3), 203, 1, 0xffff);
             painter->print("Ceny burakuf rosno!!1", 75, 185, 0, 0xffff);
             painter->draw_sprite(agro_mouth[t % agro_mouth_frame_count], 208, 79, 0, 1);
-            if (t - scene_start_t <= 5)
+            if (t - scene_start_t <= 15)
             {
                 painter->draw_sprite(segment_numbers[0], 56, 36, 0, 2);
-                painter->draw_sprite(segment_numbers[2], 76, 36, 0, 2);
+                painter->draw_sprite(segment_numbers[3], 76, 36, 0, 2);
             }
         }
-        else if (scene == 2)
-        {
-            draw_grid(painter, 44, 120, 120, 240, 0xfafa, 8, 200, 0, 0, t, 0);
-            draw_grid(painter, 44, 31, 89, 240, 0xfafa, 8, 200, 0, 0, t, 1);
-        }
-        else if (scene == 3)
-        {
-            painter->draw_sprite(channel1, 91, 76, 0, 1);
-            animate_curtain(painter, curtain, t, curtainLen);
-        }
-        else if (scene == 4)
+        else if (scene == 5)
         {
             painter->draw_sprite(channel2, 91, 76, 0, 1);
             animate_curtain(painter, curtain, t, curtainLen);
+            painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
+            if (t > scene_start_t + 45 && t <= scene_start_t + 55)
+                painter->draw_sprite(leftHands[4], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
+            else
+                painter->draw_sprite(leftHands[3], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
         }
-        if (scene < 3)
+        if (scene != 0 && scene != 3 && scene != 5)
         {
             // tv frame
             painter->draw_sprite(tv_big_frame1, 272, 20, 0, 1);
@@ -360,12 +436,30 @@ int main(void)
         debugMode->end_draw_buffer();
 #endif
         t++;
-        if (t % 60 == 0)
+        if (t == first_scene_end)
         {
-            scene++;
-            if (scene > 4)
-                scene = 0;
-            scene_start_t = t + 1;
+            scene = 1;
+            scene_start_t = first_scene_end + 1;
+        }
+        else if (t == first_scene_end + 60)
+        {
+            scene = 2;
+            scene_start_t = first_scene_end + 61;
+        }
+        else if (t == first_scene_end + 120)
+        {
+            scene = 3;
+            scene_start_t = first_scene_end + 121;
+        }
+        else if (t == first_scene_end + 180)
+        {
+            scene = 4;
+            scene_start_t = first_scene_end + 181;
+        }
+        else if (t == first_scene_end + 240)
+        {
+            scene = 5;
+            scene_start_t = first_scene_end + 241;
         }
 #if defined(PLATFORM_WINDOWS)
 
