@@ -305,14 +305,14 @@ int main(void)
         0x3447,
         0x2427,
         0x1be6,
-    }; 
-    static uint16_t plasmaNoiseColors[4] = 
-    {
-        0xffff,
-        0xad75,
-        0x5acb,
-        0x0000,
     };
+    static uint16_t plasmaNoiseColors[4] =
+        {
+            0xffff,
+            0xad75,
+            0x5acb,
+            0x0000,
+        };
     static Rectangle plasmaRect = {
         .x = 28,
         .y = 44,
@@ -343,7 +343,14 @@ int main(void)
     {
         logos[i] = storage->get_sprite(50 + i);
     }
-    const Sprite* tv_off = storage->get_sprite(54);
+    const Sprite *tv_off = storage->get_sprite(54);
+    const Sprite *tv_bug = storage->get_sprite(55);
+    const Sprite *hijacking_background = storage->get_sprite(56);
+    static Sprite *hijacking_parts[4];
+    for (uint8_t i = 0; i < 4; i++)
+    {
+        hijacking_parts[i] = storage->get_sprite(57 + i);
+    }
     //
     uint32_t t = 0;
     uint8_t scene = 0;
@@ -361,7 +368,7 @@ int main(void)
 #endif
 #endif
         painter->clear_buffer(10);
-        if (scene == 1 || scene == 3 || scene == 5)
+        if ((scene & 1) == 1)
             // tv zoom in
             painter->draw_background(tv_big_background);
         else
@@ -425,15 +432,27 @@ int main(void)
         {
             painter->draw_gradient(0x01a2, 0x1ec7, &rect, UP);
             draw_grid(painter, 44, 120, 120, 240, 0x7f4f, 8, 200, 0, 0, t, 0);
+            painter->print("PROGRAM WIECZORNY", 56, 52, 2, 0x0000);
             painter->print("PROGRAM WIECZORNY", 54, 50, 2, 0xffff);
+            painter->print("19:20\tPrzeglond dnia", 55, 71, 1, 0x0000);
             painter->print("19:20\tPrzeglond dnia", 54, 70, 1, 0xffff);
+            painter->print("20:00\tWielkie kino: Wojna swiatuf", 55, 86, 1, 0x0000);
             painter->print("20:00\tWielkie kino: Wojna swiatuf", 54, 85, 1, 0xffff);
             if (t > scene_start_t + 15)
+            {
+                painter->print("22:00\tNuszka gotuje", 55, 101, 1, 0x0000);
                 painter->print("22:00\tNuszka gotuje", 54, 100, 1, 0xffff);
+            }
             if (t > scene_start_t + 30)
+            {
+                painter->print("22:30\tProgram dla dzieci", 55, 116, 1, 0x0000);
                 painter->print("22:30\tProgram dla dzieci", 54, 115, 1, 0xffff);
+            }
             if (t > scene_start_t + 45)
+            {
+                painter->print("00:00\tKoniec programu", 55, 131, 1, 0x0000);
                 painter->print("00:00\tKoniec programu", 54, 130, 1, 0xffff);
+            }
             if (t - scene_start_t <= 15)
             {
                 painter->draw_sprite(segment_numbers[0], 56, 36, 0, 2);
@@ -517,12 +536,12 @@ int main(void)
         else if (scene == 5)
         {
             // news
-            if(t>=scene_start_t+5 && t<scene_start_t+10)
+            if (t >= scene_start_t + 5 && t < scene_start_t + 10)
                 painter->draw_plasma(plasmaNoiseColors, 4, t, 2, 3, 4, 5, 3, &plasmaRect);
             else if (t >= scene_start_t + 30 && t < scene_start_t + 35)
                 painter->draw_plasma(plasmaNoiseColors, 4, t, 2, 3, 4, 5, 3, &plasmaRect);
             else if (t >= scene_start_t + 35 && t < scene_start_t + 45)
-                painter->draw_rectangle(&rect,0x0000);
+                painter->draw_rectangle(&rect, 0x0000);
             else if (t >= scene_start_t + 45 && t < scene_start_t + 50)
                 painter->draw_plasma(plasmaNoiseColors, 4, t, 2, 3, 4, 5, 3, &plasmaRect);
             else
@@ -542,7 +561,6 @@ int main(void)
                 }
                 painter->draw_sprite(logos[2], 254, 38, 0, 1);
             }
-
         }
         else if (scene == 6)
         {
@@ -562,7 +580,33 @@ int main(void)
             else
                 painter->draw_sprite(leftHands[3], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
         }
-        if (scene == 1 || scene == 3 || scene == 5)
+        else if (scene == 7)
+        {
+            if (t - scene_start_t <= 15)
+            {
+                painter->draw_sprite(segment_numbers[0], 56, 36, 0, 2);
+                painter->draw_sprite(segment_numbers[4], 76, 36, 0, 2);
+            }
+            // bug
+            if (t < scene_start_t + 15)
+            {
+                painter->draw_sprite(tv_bug, 44, 1, 0, 1);
+                painter->draw_sprite(logos[3], 254, 38, 0, 1);
+            }
+            else
+            {
+                painter->draw_sprite(hijacking_background, 44, 1, 0, 1);
+                if (t >= scene_start_t + 30)
+                    painter->draw_sprite(hijacking_parts[0], 44, 31, 0, 1);
+                if (t >= scene_start_t + 60)
+                    painter->draw_sprite(hijacking_parts[3], 152, 105, 0, 1);
+                if (t >= scene_start_t + 90)
+                    painter->draw_sprite(hijacking_parts[2], 44, 121, 0, 1);
+                if (t >= scene_start_t + 120)
+                    painter->draw_sprite(hijacking_parts[1], 164, 30, 0, 1);
+            }
+        }
+        if ((scene & 1) == 1)
         {
             // tv frame
             painter->draw_sprite(tv_big_frame1, 272, 20, 0, 1);
@@ -621,6 +665,11 @@ int main(void)
         {
             scene = 6;
             scene_start_t = first_scene_end + 301;
+        }
+        else if (t == first_scene_end + 360)
+        {
+            scene = 7;
+            scene_start_t = first_scene_end + 361;
         }
 #if defined(PLATFORM_WINDOWS)
         cap_window_frame_rate(frame_begin_ticks);
