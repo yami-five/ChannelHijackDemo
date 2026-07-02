@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #if defined(PLATFORM_PICO)
 #include "pico/multicore.h"
@@ -46,12 +47,6 @@
 
 const IPainter *get_painter(void);
 
-static int16_t wave_offset(uint32_t t, uint16_t speed, uint32_t phase, int16_t amplitude)
-{
-    uint32_t wave_phase = (((t % TABLE_SIZE) * (uint32_t)speed) + phase) % TABLE_SIZE;
-    return (int16_t)(((int32_t)fast_sin((int32_t)wave_phase) * amplitude) >> 10);
-}
-
 static const IHardware *hardware_core;
 static const IDisplay *display;
 static const IPainter *painter;
@@ -63,6 +58,47 @@ static const IStorage *storage;
 static const IPuppeteer *puppeteer;
 #if defined(EUZEBIA3D_DEBUG_MODE)
 static const IDebugMode *debugMode;
+static char t_char[11];
+static bool pause = false;
+#endif
+
+#if defined(PLATFORM_WINDOWS)
+typedef struct WindowsEventState
+{
+    bool running;
+#if defined(EUZEBIA3D_DEBUG_MODE)
+    unsigned int pause_toggle_count;
+#endif
+} WindowsEventState;
+
+static bool SDLCALL handle_window_event(void *userdata, SDL_Event *event)
+{
+    WindowsEventState *state = (WindowsEventState *)userdata;
+    if (state == NULL || event == NULL)
+    {
+        return true;
+    }
+
+    if (event->type == SDL_EVENT_QUIT)
+    {
+        state->running = false;
+    }
+    else if (event->type == SDL_EVENT_KEY_DOWN && !event->key.repeat)
+    {
+        if (event->key.key == SDLK_ESCAPE)
+        {
+            state->running = false;
+        }
+#if defined(EUZEBIA3D_DEBUG_MODE)
+        else if (event->key.key == SDLK_SPACE)
+        {
+            state->pause_toggle_count++;
+        }
+#endif
+    }
+
+    return true;
+}
 #endif
 
 #if defined(PLATFORM_WINDOWS)
@@ -161,6 +197,21 @@ int main(void)
 #endif
     puppeteer->init_puppeteer(storage, painter);
     Puppet *pogodynka = puppeteer->create_puppet(0);
+
+#if defined(PLATFORM_WINDOWS)
+    WindowsEventState event_state = {
+        .running = true,
+#if defined(EUZEBIA3D_DEBUG_MODE)
+        .pause_toggle_count = 0u,
+#endif
+    };
+    if (!SDL_AddEventWatch(handle_window_event, &event_state))
+    {
+        SDL_Log("SDL_AddEventWatch failed: %s", SDL_GetError());
+        SDL_Quit();
+        return 1;
+    }
+#endif
 
     painter->clear_buffer(0x1100);
     painter->draw_buffer();
@@ -283,8 +334,7 @@ int main(void)
     uint32_t scene_start_t = t;
     uint32_t first_scene_end = 120;
 #if defined(PLATFORM_WINDOWS)
-    int running = 1;
-    while (running)
+    while (event_state.running)
     {
         uint64_t frame_begin_ticks = SDL_GetPerformanceCounter();
 #else
@@ -303,17 +353,18 @@ int main(void)
             painter->draw_background(tv_background);
         if (scene == 0)
         {
-            if (t > first_scene_end - 70)
+            animate_curtain(painter, curtain, t, curtainLen);
+            /*if (t > first_scene_end - 70)
             {
                 painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
                 if (t > (first_scene_end - 60) + 45 && t <= (first_scene_end - 60) + 55)
                     painter->draw_sprite(leftHands[6], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
                 else
                     painter->draw_sprite(leftHands[5], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
-            }
-            else if(t<scene_start_t+20)
+            }*/
+            if (t < scene_start_t + 20)
             {
-                painter->draw_sprite(leftHands[0], 0, 244 - (t-scene_start_t)* 7, 0, 1);
+                painter->draw_sprite(leftHands[0], 0, 244 - (t - scene_start_t) * 5, 0, 1);
                 painter->draw_sprite(rightHands[0], 168, 204 - (t - scene_start_t) * 7, 0, 1);
             }
             else if (t < scene_start_t + 30)
@@ -328,13 +379,29 @@ int main(void)
             }
             else if (t < scene_start_t + 50)
             {
-                painter->draw_sprite(leftHands[0], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
+                painter->draw_sprite(leftHands[0], 0, 135 + (t - (scene_start_t + 40)) * 10, 0, 1);
                 painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
             }
-            else if (t < scene_start_t + 70)
+            else if (t < scene_start_t + 65)
             {
-                painter->draw_sprite(leftHands[0], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
+                painter->draw_sprite(leftHands[5], -17, 242 - (t - (scene_start_t + 50)) * 7, 0, 1);
                 painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
+            }
+            else
+            {
+                if (t > (first_scene_end - 60) + 45 && t <= (first_scene_end - 60) + 55)
+                    painter->draw_sprite(leftHands[6], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
+                else
+                    painter->draw_sprite(leftHands[5], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
+                
+                if (t >= first_scene_end - 40 && t < first_scene_end - 30)
+                    painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 - (t - (first_scene_end - 40)) * 9, 0, 1);
+                else if (t >= first_scene_end - 30 && t < first_scene_end - 10)
+                    painter->draw_sprite(rightHands[4], 175 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 0 + wave_offset(t, 350u, 0u, 2), 0, 1);
+                else if (t>=first_scene_end - 10)
+                    painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 0 + (t - (first_scene_end - 10)) * 9, 0, 1);
+                else
+                    painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
             }
         }
         else if (scene == 1)
@@ -385,7 +452,14 @@ int main(void)
         {
             painter->draw_sprite(channel1, 91, 76, 0, 1);
             animate_curtain(painter, curtain, t, curtainLen);
-            painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
+            if(t<scene_start_t+10)
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90-(t - scene_start_t)*9, 0, 1);
+            else if(t < scene_start_t + 30)
+                painter->draw_sprite(rightHands[4], 166 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 0 + wave_offset(t, 350u, 0u, 2), 0, 1);
+            else if(t < scene_start_t + 40)
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 0 + (t - (scene_start_t+30)) * 9, 0, 1);
+            else
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
             if (t > scene_start_t + 45 && t <= scene_start_t + 55)
                 painter->draw_sprite(leftHands[4], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
             else
@@ -411,8 +485,16 @@ int main(void)
         else if (scene == 5)
         {
             painter->draw_sprite(channel2, 91, 76, 0, 1);
-            animate_curtain(painter, curtain, t, curtainLen);
-            painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
+            animate_curtain(painter, curtain, t, curtainLen); 
+            if (t >= scene_start_t + 10 && t < scene_start_t + 20)
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 - (t - (scene_start_t + 10)) * 9, 0, 1);
+            else if (t >= scene_start_t + 20 && t < scene_start_t + 40)
+                painter->draw_sprite(rightHands[4], 175 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 0 + wave_offset(t, 350u, 0u, 2), 0, 1);
+            else if (t >= scene_start_t + 40 && t < scene_start_t + 50)
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 0 + (t - (scene_start_t + 40)) * 9, 0, 1);
+            else 
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
+            
             if (t > scene_start_t + 45 && t <= scene_start_t + 55)
                 painter->draw_sprite(leftHands[4], -22 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 147 + wave_offset(t, 350u, TABLE_SIZE / 2u, 2), 0, 1);
             else
@@ -429,13 +511,25 @@ int main(void)
         (void)qt;
 #if defined(EUZEBIA3D_DEBUG_MODE)
         debugMode->show_info();
+        snprintf(t_char, sizeof(t_char), "%lu", (unsigned long)t);
+        painter->print(t_char, 300, 220, 1, 0xffff);
         debugMode->begin_draw_buffer();
 #endif
         painter->draw_buffer();
 #if defined(EUZEBIA3D_DEBUG_MODE)
         debugMode->end_draw_buffer();
+#if defined(PLATFORM_WINDOWS)
+        while (event_state.pause_toggle_count > 0u)
+        {
+            pause = !pause;
+            event_state.pause_toggle_count--;
+        }
 #endif
+        if (pause == false)
+            t++;
+#else
         t++;
+#endif
         if (t == first_scene_end)
         {
             scene = 1;
@@ -462,20 +556,6 @@ int main(void)
             scene_start_t = first_scene_end + 241;
         }
 #if defined(PLATFORM_WINDOWS)
-
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_EVENT_QUIT)
-            {
-                running = 0;
-            }
-            if (event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_ESCAPE)
-            {
-                running = 0;
-            }
-        }
-
         cap_window_frame_rate(frame_begin_ticks);
 #endif
 #if defined(EUZEBIA3D_DEBUG_MODE)
@@ -484,6 +564,7 @@ int main(void)
     }
 
 #if defined(PLATFORM_WINDOWS)
+    SDL_RemoveEventWatch(handle_window_event, &event_state);
     SDL_Quit();
     return 0;
 #else

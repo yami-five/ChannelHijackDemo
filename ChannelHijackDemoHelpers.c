@@ -377,3 +377,9 @@ void draw_grid(const IPainter *painter, int16_t x, int16_t y, uint16_t height, u
         }
     }
 }
+
+int16_t wave_offset(uint32_t t, uint16_t speed, uint32_t phase, int16_t amplitude)
+{
+    uint32_t wave_phase = (((t % TABLE_SIZE) * (uint32_t)speed) + phase) % TABLE_SIZE;
+    return (int16_t)(((int32_t)fast_sin((int32_t)wave_phase) * amplitude) >> 10);
+}

@@ -18,5 +18,6 @@ void cap_window_frame_rate(uint64_t frame_begin_ticks);
 
 void animate_curtain(const IPainter *painter, Sprite *curtain[], int t, uint16_t bands);
 void draw_grid(const IPainter *painter, int16_t x, int16_t y, uint16_t height, uint16_t width, uint16_t color, uint8_t linesNum, uint8_t offset, int16_t offsetX, int16_t offsetY, int t, uint8_t direction);
+int16_t wave_offset(uint32_t t, uint16_t speed, uint32_t phase, int16_t amplitude);
 
 #endif
