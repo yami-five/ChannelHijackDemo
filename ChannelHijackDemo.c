@@ -351,6 +351,13 @@ int main(void)
     {
         hijacking_parts[i] = storage->get_sprite(57 + i);
     }
+    const Sprite *big_bug_dark = storage->get_sprite(61);
+    const Sprite *big_bug = storage->get_sprite(62);
+    const Sprite *hijacking_break = storage->get_sprite(63);
+    const Sprite *hijacking = storage->get_sprite(64);
+    const Sprite *alert = storage->get_sprite(65);
+    const Sprite *alert_alternate = storage->get_sprite(66);
+    const Sprite *alert_small = storage->get_sprite(67);
     //
     uint32_t t = 0;
     uint8_t scene = 0;
@@ -593,18 +600,95 @@ int main(void)
                 painter->draw_sprite(tv_bug, 44, 1, 0, 1);
                 painter->draw_sprite(logos[3], 254, 38, 0, 1);
             }
+            else if (t >= scene_start_t + 15 && t < scene_start_t + 20)
+                painter->draw_plasma(plasmaNoiseColors, 4, t, 2, 3, 4, 5, 3, &plasmaRect);
+            else if (t >= scene_start_t + 45 && t < scene_start_t + 50)
+                painter->draw_plasma(plasmaNoiseColors, 4, t, 2, 3, 4, 5, 3, &plasmaRect);
+            else if (t >= scene_start_t + 70 && t < scene_start_t + 75)
+                painter->draw_plasma(plasmaNoiseColors, 4, t, 2, 3, 4, 5, 3, &plasmaRect);
+            else if (t >= scene_start_t + 75 && t < scene_start_t + 90)
+                painter->draw_sprite(hijacking_break, 44, 1, 0, 1);
+            else if (t >= scene_start_t + 90 && t < scene_start_t + 95)
+                painter->draw_plasma(plasmaNoiseColors, 4, t, 2, 3, 4, 5, 3, &plasmaRect);
             else
             {
                 painter->draw_sprite(hijacking_background, 44, 1, 0, 1);
-                if (t >= scene_start_t + 30)
+                if (t >= scene_start_t + 35)
                     painter->draw_sprite(hijacking_parts[0], 44, 31, 0, 1);
-                if (t >= scene_start_t + 60)
+                if (t >= scene_start_t + 65)
                     painter->draw_sprite(hijacking_parts[3], 152, 105, 0, 1);
-                if (t >= scene_start_t + 90)
+                if (t >= scene_start_t + 95)
                     painter->draw_sprite(hijacking_parts[2], 44, 121, 0, 1);
-                if (t >= scene_start_t + 120)
+                if (t >= scene_start_t + 125)
                     painter->draw_sprite(hijacking_parts[1], 164, 30, 0, 1);
+                if (t >= scene_start_t + 170)
+                    painter->draw_sprite(big_bug, 112, 53, 0, 1);
+                else
+                    painter->draw_sprite(big_bug_dark, 112, 62, 0, 1);
             }
+            if (t >= scene_start_t + 100 && t < scene_start_t + 115)
+            {
+                painter->draw_sprite(segment_numbers[1], 56, 36, 0, 2);
+                painter->draw_sprite(segment_numbers[0], 76, 36, 0, 2);
+            }
+            else if (t >= scene_start_t + 90 && t < scene_start_t + 100)
+            {
+                painter->draw_sprite(segment_numbers[0], 56, 36, 0, 2);
+                painter->draw_sprite(segment_numbers[9], 76, 36, 0, 2);
+            }
+            else if (t >= scene_start_t + 75 && t < scene_start_t + 90)
+            {
+                painter->draw_sprite(segment_numbers[0], 56, 36, 0, 2);
+                painter->draw_sprite(segment_numbers[8], 76, 36, 0, 2);
+            }
+            else if (t >= scene_start_t + 60 && t < scene_start_t + 75)
+            {
+                painter->draw_sprite(segment_numbers[0], 56, 36, 0, 2);
+                painter->draw_sprite(segment_numbers[7], 76, 36, 0, 2);
+            }
+            else if (t >= scene_start_t + 45 && t < scene_start_t + 60)
+            {
+                painter->draw_sprite(segment_numbers[0], 56, 36, 0, 2);
+                painter->draw_sprite(segment_numbers[6], 76, 36, 0, 2);
+            }
+        }
+        else if (scene == 8)
+        {
+            painter->draw_sprite(hijacking, 91, 76, 0, 1);
+            animate_curtain(painter, curtain, t, curtainLen);
+            if (t >= scene_start_t + 10 && t < scene_start_t + 20)
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 - (t - (scene_start_t + 10)) * 9, 0, 1);
+            else if (t >= scene_start_t + 20 && t < scene_start_t + 70)
+                painter->draw_sprite(rightHands[4], 175 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 0 + wave_offset(t, 350u, 0u, 2), 0, 1);
+            else if (t >= scene_start_t + 70 && t < scene_start_t + 80)
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 0 + (t - (scene_start_t + 70)) * 9, 0, 1);
+            else
+                painter->draw_sprite(rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
+        }
+        else if (scene == 9)
+        {
+            painter->draw_sprite(hijacking_background, 44, 1, 0, 1);
+            painter->draw_sprite(hijacking_parts[0], 44, 31, 0, 1);
+            painter->draw_sprite(hijacking_parts[3], 152, 105, 0, 1);
+            painter->draw_sprite(hijacking_parts[2], 44, 121, 0, 1);
+            painter->draw_sprite(hijacking_parts[1], 164, 30, 0, 1);
+            if (t >= scene_start_t + 30)
+                painter->draw_sprite(big_bug, 112, 53, 0, 1);
+            else
+                painter->draw_sprite(big_bug_dark, 112, 62, 0, 1);
+            if (t >= scene_start_t + 45 && t < scene_start_t + 50)
+                painter->draw_plasma(plasmaNoiseColors, 4, t, 2, 3, 4, 5, 3, &plasmaRect);
+            else if (t >= scene_start_t + 50 && t < scene_start_t + 80)
+                painter->draw_sprite(alert, 44, 1, 0, 1);
+            if (t >= scene_start_t + 80 && t < scene_start_t + 85)
+                painter->draw_plasma(plasmaNoiseColors, 4, t, 2, 3, 4, 5, 3, &plasmaRect);
+            else if (t >= scene_start_t + 85)
+                painter->draw_sprite(alert_alternate, 44, 1, 0, 1);
+        }
+        else if (scene == 10)
+        {
+            painter->draw_sprite(alert_small, 91, 76, 0, 1);
+            animate_curtain(painter, curtain, t, curtainLen);
         }
         if ((scene & 1) == 1)
         {
@@ -670,6 +754,21 @@ int main(void)
         {
             scene = 7;
             scene_start_t = first_scene_end + 361;
+        }
+        else if (t == first_scene_end + 475)
+        {
+            scene = 8;
+            scene_start_t = first_scene_end + 476;
+        }
+        else if (t == first_scene_end + 555)
+        {
+            scene = 9;
+            scene_start_t = first_scene_end + 556;
+        }
+        else if (t == first_scene_end + 655)
+        {
+            scene = 10;
+            scene_start_t = first_scene_end + 656;
         }
 #if defined(PLATFORM_WINDOWS)
         cap_window_frame_rate(frame_begin_ticks);
