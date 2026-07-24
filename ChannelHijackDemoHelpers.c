@@ -1,7 +1,5 @@
 #include "ChannelHijackDemoHelpers.h"
 
-#include "fpa.h"
-
 #if defined(PLATFORM_WINDOWS)
 #include <SDL3/SDL.h>
 
@@ -60,7 +58,7 @@ void cap_window_frame_rate(uint64_t frame_begin_ticks)
 }
 #endif
 
-void animate_curtain(const IPainter *painter, Sprite *curtain[], int t, uint16_t bands)
+void animate_curtain(e3d_EngineContext *engine_ctx, const e3d_Sprite *curtain[], int t, uint16_t bands)
 {
     const int16_t base_x = -55;
     const uint16_t max_amp = 6;
@@ -68,7 +66,7 @@ void animate_curtain(const IPainter *painter, Sprite *curtain[], int t, uint16_t
     const uint16_t phase_step = 700;
     uint32_t base_phase;
 
-    if (painter == NULL || curtain == NULL || bands == 0u)
+    if (engine_ctx == NULL || curtain == NULL || bands == 0u)
     {
         return;
     }
@@ -80,7 +78,7 @@ void animate_curtain(const IPainter *painter, Sprite *curtain[], int t, uint16_t
         uint32_t phase = (base_phase + i * phase_step) % TABLE_SIZE;
         int16_t wave = fast_sin((int32_t)phase);
         int16_t offset = (int16_t)(((int32_t)wave * amp) >> 10);
-        painter->draw_sprite(curtain[i], offset + base_x, curtain[i]->height * i, 0, 1);
+        e3d_Painter_DrawSprite(engine_ctx, curtain[i], offset + base_x, curtain[i]->height * i, 0, 1);
     }
 }
 
@@ -102,9 +100,9 @@ static int16_t grid_lerp_position(int16_t start, int16_t end, uint16_t position,
     return (int16_t)(start + (((int32_t)position * ((int32_t)end - start)) / (span - 1u)));
 }
 
-static Point grid_lerp_point(Point start, Point end, uint16_t position, uint16_t span)
+static e3d_Point grid_lerp_point(e3d_Point start, e3d_Point end, uint16_t position, uint16_t span)
 {
-    Point point = {
+    e3d_Point point = {
         .x = grid_lerp_position(start.x, end.x, position, span),
         .y = grid_lerp_position(start.y, end.y, position, span),
     };
@@ -139,7 +137,7 @@ static int16_t grid_screen_y_to_buffer_y(int16_t screenY)
     return (int16_t)((EUZEBIA3D_DISPLAY_HEIGHT - 1) - screenY);
 }
 
-static Point grid_screen_point_to_buffer(Point point)
+static e3d_Point grid_screen_point_to_buffer(e3d_Point point)
 {
     point.y = grid_screen_y_to_buffer_y(point.y);
     return point;
@@ -161,7 +159,7 @@ static uint8_t grid_clip_out_code(int32_t x, int32_t y, int32_t left, int32_t to
     return code;
 }
 
-static uint8_t grid_clip_line_to_rect(Point *start, Point *end, int16_t left, int16_t top, int16_t right, int16_t bottom)
+static uint8_t grid_clip_line_to_rect(e3d_Point *start, e3d_Point *end, int16_t left, int16_t top, int16_t right, int16_t bottom)
 {
     int32_t x0 = start->x;
     int32_t y0 = start->y;
@@ -237,7 +235,7 @@ static uint8_t grid_clip_line_to_rect(Point *start, Point *end, int16_t left, in
     }
 }
 
-static void grid_draw_horizontal_line(const IPainter *painter, Point start, Point end, int16_t left, int16_t top, int16_t right, int16_t bottom, uint16_t color)
+static void grid_draw_horizontal_line(e3d_EngineContext *engine_ctx, e3d_Point start, e3d_Point end, int16_t left, int16_t top, int16_t right, int16_t bottom, uint16_t color)
 {
     if (start.y < top || start.y > bottom)
         return;
@@ -259,22 +257,22 @@ static void grid_draw_horizontal_line(const IPainter *painter, Point start, Poin
     if (end_x > right)
         end_x = right;
 
-    Point clipped_start = {
+    e3d_Point clipped_start = {
         .x = start_x,
         .y = start.y,
     };
-    Point clipped_end = {
+    e3d_Point clipped_end = {
         .x = end_x,
         .y = start.y,
     };
     clipped_start = grid_screen_point_to_buffer(clipped_start);
     clipped_end = grid_screen_point_to_buffer(clipped_end);
-    painter->draw_line(&clipped_start, &clipped_end, color);
+    e3d_Painter_DrawLine(engine_ctx, &clipped_start, &clipped_end, color);
 }
 
-void draw_grid(const IPainter *painter, int16_t x, int16_t y, uint16_t height, uint16_t width, uint16_t color, uint8_t linesNum, uint8_t offset, int16_t offsetX, int16_t offsetY, int t, uint8_t direction)
+void draw_grid(e3d_EngineContext *engine_ctx, int16_t x, int16_t y, uint16_t height, uint16_t width, uint16_t color, uint8_t linesNum, uint8_t offset, int16_t offsetX, int16_t offsetY, int t, uint8_t direction)
 {
-    if (painter == NULL || linesNum == 0u || width == 0u || height == 0u)
+    if (engine_ctx == NULL || linesNum == 0u || width == 0u || height == 0u)
         return;
 
     int16_t clipLeft = x;
@@ -283,19 +281,19 @@ void draw_grid(const IPainter *painter, int16_t x, int16_t y, uint16_t height, u
     int16_t clipBottom = (int16_t)(y + height - 1u);
     int16_t gridX = (int16_t)(x + offsetX);
     int16_t gridY = (int16_t)(y + offsetY);
-    Point topLeft = {
+    e3d_Point topLeft = {
         .x = gridX,
         .y = gridY,
     };
-    Point topRight = {
+    e3d_Point topRight = {
         .x = (int16_t)(gridX + width - 1u),
         .y = gridY,
     };
-    Point bottomLeft = {
+    e3d_Point bottomLeft = {
         .x = gridX,
         .y = (int16_t)(gridY + height - 1u),
     };
-    Point bottomRight = {
+    e3d_Point bottomRight = {
         .x = (int16_t)(gridX + width - 1u),
         .y = (int16_t)(gridY + height - 1u),
     };
@@ -324,8 +322,8 @@ void draw_grid(const IPainter *painter, int16_t x, int16_t y, uint16_t height, u
     uint8_t moveVertical = direction == GRID_MOVE_LEFT || direction == GRID_MOVE_RIGHT;
     for (uint8_t i = 0; i < linesNum; i++)
     {
-        Point top;
-        Point bottom;
+        e3d_Point top;
+        e3d_Point bottom;
         if (moveVertical)
         {
             uint16_t position = grid_wrapped_position(width, i, linesNum, t, direction == GRID_MOVE_LEFT);
@@ -343,15 +341,15 @@ void draw_grid(const IPainter *painter, int16_t x, int16_t y, uint16_t height, u
         {
             top = grid_screen_point_to_buffer(top);
             bottom = grid_screen_point_to_buffer(bottom);
-            painter->draw_line(&top, &bottom, color);
+            e3d_Painter_DrawLine(engine_ctx, &top, &bottom, color);
         }
     }
 
     uint8_t moveHorizontal = direction == GRID_MOVE_DOWN || direction == GRID_MOVE_UP;
     for (uint8_t i = 0; i < linesNum; i++)
     {
-        Point left;
-        Point right;
+        e3d_Point left;
+        e3d_Point right;
         if (moveHorizontal)
         {
             uint16_t position = grid_wrapped_position(height, i, linesNum, t, direction == GRID_MOVE_UP);
@@ -367,13 +365,13 @@ void draw_grid(const IPainter *painter, int16_t x, int16_t y, uint16_t height, u
         }
         if (left.y == right.y)
         {
-            grid_draw_horizontal_line(painter, left, right, clipLeft, clipTop, clipRight, clipBottom, color);
+            grid_draw_horizontal_line(engine_ctx, left, right, clipLeft, clipTop, clipRight, clipBottom, color);
         }
         else if (grid_clip_line_to_rect(&left, &right, clipLeft, clipTop, clipRight, clipBottom))
         {
             left = grid_screen_point_to_buffer(left);
             right = grid_screen_point_to_buffer(right);
-            painter->draw_line(&left, &right, color);
+            e3d_Painter_DrawLine(engine_ctx, &left, &right, color);
         }
     }
 }

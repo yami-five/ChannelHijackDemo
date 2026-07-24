@@ -2,7 +2,7 @@
 #include "string.h"
 
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l1_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l1_0_l1_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_head",
         .x = 0,
@@ -17,7 +17,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l1_0_childPuppetBonesLayer
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l1_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_head_root",
         .x = -2,
@@ -32,7 +32,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_childPuppetBonesLayer1[] =
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_l1_0_l1_0_l1_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_l1_0_l1_0_l1_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_left_hand",
         .x = -22,
@@ -47,7 +47,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_l1_0_l1_0_l1_0_c
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_l1_0_l1_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_l1_0_l1_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_left_wrist",
         .x = -2,
@@ -62,7 +62,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_l1_0_l1_0_childP
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_l1_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_l1_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_left_forearm",
         .x = -32,
@@ -77,7 +77,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_l1_0_childPuppet
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_left_arm_elbow",
         .x = 0,
@@ -92,7 +92,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_childPuppetBones
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_left_arm",
         .x = -30,
@@ -107,7 +107,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_0_childPuppetBonesLayer
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_1_l1_0_l1_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_1_l1_0_l1_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_right_forearm",
         .x = 46,
@@ -122,7 +122,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_1_l1_0_l1_0_childPuppet
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_1_l1_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_1_l1_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_right_elbow",
         .x = 1,
@@ -137,7 +137,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_1_l1_0_childPuppetBones
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_1_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_1_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_right_arm",
         .x = 34,
@@ -152,7 +152,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_l2_1_childPuppetBonesLayer
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_childPuppetBonesLayer2[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l1_0_childPuppetBonesLayer2[] = {
     {
         .label = "pogodynka_left_arm_root",
         .x = -23,
@@ -179,7 +179,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l1_0_childPuppetBonesLayer2[] =
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_torso",
         .x = 1,
@@ -194,7 +194,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_childPuppetBonesLayer1[] = {
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l2_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l2_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_left_leg",
         .x = 0,
@@ -209,7 +209,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l2_0_childPuppetBonesLayer1[] =
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_l2_1_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_l2_1_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_right_leg",
         .x = 0,
@@ -224,7 +224,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_l2_1_childPuppetBonesLayer1[] =
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_l1_0_childPuppetBonesLayer2[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_l1_0_childPuppetBonesLayer2[] = {
     {
         .label = "pogodynka_left_leg_root",
         .x = -12,
@@ -251,7 +251,7 @@ static const RawPuppetBone pogodynka_root_0_l1_0_childPuppetBonesLayer2[] = {
     },
 };
 
-static const RawPuppetBone pogodynka_root_0_childPuppetBonesLayer1[] = {
+static const e3d_RawPuppetBone pogodynka_root_0_childPuppetBonesLayer1[] = {
     {
         .label = "pogodynka_pelvis",
         .x = 0,
@@ -266,7 +266,7 @@ static const RawPuppetBone pogodynka_root_0_childPuppetBonesLayer1[] = {
     },
 };
 
-static const RawPuppetBone pogodynka_puppetBones[] = {
+static const e3d_RawPuppetBone pogodynka_puppetBones[] = {
     {
         .label = "pogodynkaRoot",
         .x = 257,
@@ -281,27 +281,27 @@ static const RawPuppetBone pogodynka_puppetBones[] = {
     },
 };
 
-static const RawFrame pogodynka_anim1_track0_frames[] = {
+static const e3d_RawFrame pogodynka_anim1_track0_frames[] = {
     {.x = 257, .y = 179, .angle = 0.0f, .startFrameNum = 60},
     {.x = 188, .y = 179, .angle = 0.0f, .startFrameNum = 70},
     {.x = 188, .y = 179, .angle = 0.0f, .startFrameNum = 110},
 };
 
-static const RawAnimation pogodynka_anim1_track0_animation = {
+static const e3d_RawAnimation pogodynka_anim1_track0_animation = {
     .frames = pogodynka_anim1_track0_frames,
     .framesNum = 3,
 };
 
-static const RawFrame pogodynka_anim1_track1_frames[] = {
+static const e3d_RawFrame pogodynka_anim1_track1_frames[] = {
     {.x = -30, .y = 0, .angle = -1.4f, .startFrameNum = 70},
 };
 
-static const RawAnimation pogodynka_anim1_track1_animation = {
+static const e3d_RawAnimation pogodynka_anim1_track1_animation = {
     .frames = pogodynka_anim1_track1_frames,
     .framesNum = 1,
 };
 
-static const RawFrame pogodynka_anim1_track2_frames[] = {
+static const e3d_RawFrame pogodynka_anim1_track2_frames[] = {
     {.x = 0, .y = 0, .angle = 0.0f, .startFrameNum = 15},
     {.x = 0, .y = 0, .angle = 0.2f, .startFrameNum = 17},
     {.x = 0, .y = 0, .angle = 0.0f, .startFrameNum = 20},
@@ -315,12 +315,12 @@ static const RawFrame pogodynka_anim1_track2_frames[] = {
     {.x = 0, .y = 0, .angle = 1.2f, .startFrameNum = 100},
 };
 
-static const RawAnimation pogodynka_anim1_track2_animation = {
+static const e3d_RawAnimation pogodynka_anim1_track2_animation = {
     .frames = pogodynka_anim1_track2_frames,
     .framesNum = 11,
 };
 
-static const RawFrame pogodynka_anim1_track3_frames[] = {
+static const e3d_RawFrame pogodynka_anim1_track3_frames[] = {
     {.x = -23, .y = 10, .angle = -1.3f, .startFrameNum = 0},
     {.x = -23, .y = 10, .angle = 0.3f, .startFrameNum = 10},
     {.x = -23, .y = 10, .angle = 0.3f, .startFrameNum = 20},
@@ -333,12 +333,12 @@ static const RawFrame pogodynka_anim1_track3_frames[] = {
     {.x = -23, .y = 10, .angle = -1.2f, .startFrameNum = 100},
 };
 
-static const RawAnimation pogodynka_anim1_track3_animation = {
+static const e3d_RawAnimation pogodynka_anim1_track3_animation = {
     .frames = pogodynka_anim1_track3_frames,
     .framesNum = 10,
 };
 
-static const RawFrame pogodynka_anim1_track4_frames[] = {
+static const e3d_RawFrame pogodynka_anim1_track4_frames[] = {
     {.x = -12, .y = 33, .angle = 0.0f, .startFrameNum = 0},
     {.x = -12, .y = 32, .angle = 0.0f, .startFrameNum = 50},
     {.x = -12, .y = 33, .angle = 0.0f, .startFrameNum = 60},
@@ -347,34 +347,34 @@ static const RawFrame pogodynka_anim1_track4_frames[] = {
     {.x = -12, .y = 33, .angle = 0.0001f, .startFrameNum = 70},
 };
 
-static const RawAnimation pogodynka_anim1_track4_animation = {
+static const e3d_RawAnimation pogodynka_anim1_track4_animation = {
     .frames = pogodynka_anim1_track4_frames,
     .framesNum = 6,
 };
 
-static const RawFrame pogodynka_anim1_track5_frames[] = {
+static const e3d_RawFrame pogodynka_anim1_track5_frames[] = {
     {.x = 23, .y = 9, .angle = 1.3f, .startFrameNum = 45},
     {.x = 23, .y = 9, .angle = 1.6f, .startFrameNum = 50},
     {.x = 23, .y = 9, .angle = 1.3f, .startFrameNum = 67},
 };
 
-static const RawAnimation pogodynka_anim1_track5_animation = {
+static const e3d_RawAnimation pogodynka_anim1_track5_animation = {
     .frames = pogodynka_anim1_track5_frames,
     .framesNum = 3,
 };
 
-static const RawFrame pogodynka_anim1_track6_frames[] = {
+static const e3d_RawFrame pogodynka_anim1_track6_frames[] = {
     {.x = 1, .y = 1, .angle = 0.0f, .startFrameNum = 45},
     {.x = 1, .y = 1, .angle = 1.1f, .startFrameNum = 50},
     {.x = 1, .y = 1, .angle = 0.1f, .startFrameNum = 67},
 };
 
-static const RawAnimation pogodynka_anim1_track6_animation = {
+static const e3d_RawAnimation pogodynka_anim1_track6_animation = {
     .frames = pogodynka_anim1_track6_frames,
     .framesNum = 3,
 };
 
-static const RawFrame pogodynka_anim1_track7_frames[] = {
+static const e3d_RawFrame pogodynka_anim1_track7_frames[] = {
     {.x = 12, .y = 33, .angle = 0.0f, .startFrameNum = 0},
     {.x = 12, .y = 32, .angle = 0.0f, .startFrameNum = 50},
     {.x = 12, .y = 33, .angle = 0.0f, .startFrameNum = 60},
@@ -383,12 +383,12 @@ static const RawFrame pogodynka_anim1_track7_frames[] = {
     {.x = 12, .y = 33, .angle = 0.0001f, .startFrameNum = 70},
 };
 
-static const RawAnimation pogodynka_anim1_track7_animation = {
+static const e3d_RawAnimation pogodynka_anim1_track7_animation = {
     .frames = pogodynka_anim1_track7_frames,
     .framesNum = 6,
 };
 
-static const RawBoneAnimationPair pogodynka_anim1_boneAnimationPairs[] = {
+static const e3d_RawBoneAnimationPair pogodynka_anim1_boneAnimationPairs[] = {
     {.rawBone = &pogodynka_puppetBones[0], .rawAnimation = &pogodynka_anim1_track0_animation}, /* root bone */
     {.rawBone = &pogodynka_root_0_l1_0_l1_0_l2_0_childPuppetBonesLayer1[0], .rawAnimation = &pogodynka_anim1_track1_animation},
     {.rawBone = &pogodynka_root_0_l1_0_l1_0_l2_0_l1_0_childPuppetBonesLayer1[0], .rawAnimation = &pogodynka_anim1_track2_animation},
@@ -399,7 +399,7 @@ static const RawBoneAnimationPair pogodynka_anim1_boneAnimationPairs[] = {
     {.rawBone = &pogodynka_root_0_l1_0_childPuppetBonesLayer2[1], .rawAnimation = &pogodynka_anim1_track7_animation},
 };
 
-const RawPuppet rawPuppets[1] = {
+const e3d_RawPuppet rawPuppets[1] = {
     {
         .label = "pogodynkaRoot",
         .x = 0,

@@ -5,7 +5,7 @@ const Scroller scrollers[1] = {
     {0},
 };
 #else
-const Scroller scrollers[0] = {
+const e3d_Scroller scrollers[0] = {
     
 };
 #endif
