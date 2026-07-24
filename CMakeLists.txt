@@ -71,9 +71,16 @@ endif()
 
 add_executable(ChannelHijackDemo
     ChannelHijackDemo.c
-    ChannelHijackDemoHelpers.c
+    libs/animation/animation.c
+    libs/grid/grid.c
+    libs/sdl_wrapper/sdl_wrapper.c
 )
-target_include_directories(ChannelHijackDemo PRIVATE "${CMAKE_CURRENT_LIST_DIR}")
+target_include_directories(ChannelHijackDemo PRIVATE
+    "${CMAKE_CURRENT_LIST_DIR}"
+    "${CMAKE_CURRENT_LIST_DIR}/libs/animation"
+    "${CMAKE_CURRENT_LIST_DIR}/libs/grid"
+    "${CMAKE_CURRENT_LIST_DIR}/libs/sdl_wrapper"
+)
 target_link_libraries(ChannelHijackDemo PRIVATE Euzebia3D_libs)
 
 if(DEBUG_MODE)

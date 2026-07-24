@@ -6,55 +6,16 @@
 #if defined(PLATFORM_PICO)
 #include "pico/multicore.h"
 #include "pico/time.h"
-#elif defined(PLATFORM_WINDOWS)
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
 #endif
 
 #include "engineApi.h"
-#include "ChannelHijackDemoHelpers.h"
+#include "animation.h"
+#include "grid.h"
+#include "sdl_wrapper.h"
 
 static e3d_EngineContext engine;
 static e3d_EngineContext *engine_ctx = &engine;
 static char t_char[11];
-static bool pause = false;
-
-#if defined(PLATFORM_WINDOWS)
-typedef struct WindowsEventState
-{
-    bool running;
-    unsigned int pause_toggle_count;
-} WindowsEventState;
-
-static bool SDLCALL handle_window_event(void *userdata, SDL_Event *event)
-{
-    WindowsEventState *state = (WindowsEventState *)userdata;
-    if (state == NULL || event == NULL)
-    {
-        return true;
-    }
-
-    if (event->type == SDL_EVENT_QUIT)
-    {
-        state->running = false;
-    }
-    else if (event->type == SDL_EVENT_KEY_DOWN && !event->key.repeat)
-    {
-        if (event->key.key == SDLK_ESCAPE)
-        {
-            state->running = false;
-        }
-#if defined(EUZEBIA3D_DEBUG_MODE)
-        else if (event->key.key == SDLK_SPACE)
-        {
-            state->pause_toggle_count++;
-        }
-#endif
-    }
-
-    return true;
-}
-#endif
 
 #if defined(PLATFORM_WINDOWS)
 int main(int argc, char **argv)
@@ -71,16 +32,9 @@ int main(void)
     e3d_Puppet *pogodynka = e3d_Puppetteer_CreatePuppet(engine_ctx, 0);
 
 #if defined(PLATFORM_WINDOWS)
-    WindowsEventState event_state = {
-        .running = true,
-#if defined(EUZEBIA3D_DEBUG_MODE)
-        .pause_toggle_count = 0u,
-#endif
-    };
-    if (!SDL_AddEventWatch(handle_window_event, &event_state))
+    SdlApplication application;
+    if (!sdl_application_init(&application, 24u))
     {
-        SDL_Log("SDL_AddEventWatch failed: %s", SDL_GetError());
-        SDL_Quit();
         return 1;
     }
 #endif
@@ -148,6 +102,30 @@ int main(void)
     {
         curtain[i] = engine_ctx->storage->get_sprite(37);
     }
+    const SpriteWaveAnimation curtain_animation = {
+        .origin_x = -55,
+        .origin_y = 0,
+        .spacing_x = 0,
+        .spacing_y = (int16_t)curtain[0]->height,
+        .amplitude_x = 6,
+        .amplitude_y = 0,
+        .speed = 500,
+        .phase_step = 700,
+        .angle = 0,
+        .scale = 1,
+    };
+    const GridConfig program_grid = {
+        .x = 44,
+        .y = 120,
+        .height = 120,
+        .width = 240,
+        .color = 0x7f4f,
+        .line_count = 8,
+        .perspective_offset = 200,
+        .offset_x = 0,
+        .offset_y = 0,
+        .direction = GRID_DIRECTION_DOWN,
+    };
     const e3d_Sprite *leftHands[7];
     for (uint8_t i = 0; i < 7; i++)
     {
@@ -234,9 +212,9 @@ int main(void)
     uint32_t scene_start_t = t;
     uint32_t first_scene_end = 120;
 #if defined(PLATFORM_WINDOWS)
-    while (event_state.running)
+    while (sdl_application_is_running(&application))
     {
-        uint64_t frame_begin_ticks = SDL_GetPerformanceCounter();
+        sdl_application_begin_frame(&application);
 #else
     while (1)
     {
@@ -254,7 +232,7 @@ int main(void)
         if (scene == 0)
         {
             e3d_Painter_DrawSprite(engine_ctx, tv_off, 91, 76, 0, 1);
-            animate_curtain(engine_ctx, curtain, t, curtainLen);
+            draw_sprite_wave(engine_ctx, curtain, curtainLen, t, &curtain_animation);
             /*if (t > first_scene_end - 70)
             {
                 e3d_Painter_DrawSprite(engine_ctx, rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 + wave_offset(t, 350u, 0u, 2), 0, 1);
@@ -308,7 +286,7 @@ int main(void)
         else if (scene == 1)
         {
             e3d_Painter_DrawGradient(engine_ctx, 0x01a2, 0x1ec7, &rect, UP);
-            draw_grid(engine_ctx, 44, 120, 120, 240, 0x7f4f, 8, 200, 0, 0, t, 0);
+            draw_grid(engine_ctx, &program_grid, t);
             e3d_Painter_Print(engine_ctx, "PROGRAM WIECZORNY", 56, 52, 2, 0x0000);
             e3d_Painter_Print(engine_ctx, "PROGRAM WIECZORNY", 54, 50, 2, 0xffff);
             e3d_Painter_Print(engine_ctx, "19:20\tPrzeglond dnia", 55, 71, 1, 0x0000);
@@ -340,7 +318,7 @@ int main(void)
         else if (scene == 2)
         {
             e3d_Painter_DrawSprite(engine_ctx, channels[0], 91, 76, 0, 1);
-            animate_curtain(engine_ctx, curtain, t, curtainLen);
+            draw_sprite_wave(engine_ctx, curtain, curtainLen, t, &curtain_animation);
             if (t < scene_start_t + 5)
                 e3d_Painter_DrawSprite(engine_ctx, rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 - (t - scene_start_t) * 9, 0, 1);
             else if (t < scene_start_t + 25)
@@ -396,7 +374,7 @@ int main(void)
         else if (scene == 4)
         {
             e3d_Painter_DrawSprite(engine_ctx, channels[1], 91, 76, 0, 1);
-            animate_curtain(engine_ctx, curtain, t, curtainLen);
+            draw_sprite_wave(engine_ctx, curtain, curtainLen, t, &curtain_animation);
             if (t < scene_start_t + 10)
                 e3d_Painter_DrawSprite(engine_ctx, rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 - (t - scene_start_t) * 9, 0, 1);
             else if (t < scene_start_t + 30)
@@ -442,7 +420,7 @@ int main(void)
         else if (scene == 6)
         {
             e3d_Painter_DrawSprite(engine_ctx, channels[2], 91, 76, 0, 1);
-            animate_curtain(engine_ctx, curtain, t, curtainLen);
+            draw_sprite_wave(engine_ctx, curtain, curtainLen, t, &curtain_animation);
             if (t >= scene_start_t + 10 && t < scene_start_t + 20)
                 e3d_Painter_DrawSprite(engine_ctx, rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 - (t - (scene_start_t + 10)) * 9, 0, 1);
             else if (t >= scene_start_t + 20 && t < scene_start_t + 40)
@@ -525,7 +503,7 @@ int main(void)
         else if (scene == 8)
         {
             e3d_Painter_DrawSprite(engine_ctx, hijacking, 91, 76, 0, 1);
-            animate_curtain(engine_ctx, curtain, t, curtainLen);
+            draw_sprite_wave(engine_ctx, curtain, curtainLen, t, &curtain_animation);
             if (t >= scene_start_t + 10 && t < scene_start_t + 20)
                 e3d_Painter_DrawSprite(engine_ctx, rightHands[3], 165 + wave_offset(t, 350u, -TABLE_SIZE / 2u, 2), 90 - (t - (scene_start_t + 10)) * 9, 0, 1);
             else if (t >= scene_start_t + 20 && t < scene_start_t + 70)
@@ -558,7 +536,7 @@ int main(void)
         else if (scene == 10)
         {
             e3d_Painter_DrawSprite(engine_ctx, alert_small, 91, 76, 0, 1);
-            animate_curtain(engine_ctx, curtain, t, curtainLen);
+            draw_sprite_wave(engine_ctx, curtain, curtainLen, t, &curtain_animation);
         }
         if ((scene & 1) == 1)
         {
@@ -579,14 +557,11 @@ int main(void)
 #if defined(EUZEBIA3D_DEBUG_MODE)
         e3d_Debug_EndDrawBuffer(engine_ctx);
 #if defined(PLATFORM_WINDOWS)
-        while (event_state.pause_toggle_count > 0u)
-        {
-            pause = !pause;
-            event_state.pause_toggle_count--;
-        }
-#endif
-        if (pause == false)
+        if (!sdl_application_is_paused(&application))
             t++;
+#else
+        t++;
+#endif
 #else
         t++;
 #endif
@@ -641,7 +616,7 @@ int main(void)
             scene_start_t = first_scene_end + 656;
         }
 #if defined(PLATFORM_WINDOWS)
-        cap_window_frame_rate(frame_begin_ticks);
+        sdl_application_end_frame(&application);
 #endif
 #if defined(EUZEBIA3D_DEBUG_MODE)
         e3d_Debug_EndFrame(engine_ctx);
@@ -649,8 +624,7 @@ int main(void)
     }
 
 #if defined(PLATFORM_WINDOWS)
-    SDL_RemoveEventWatch(handle_window_event, &event_state);
-    SDL_Quit();
+    sdl_application_shutdown(&application);
     return 0;
 #else
     // multicore_launch_core1(core1_main);

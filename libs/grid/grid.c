@@ -1,86 +1,4 @@
-#include "ChannelHijackDemoHelpers.h"
-
-#if defined(PLATFORM_WINDOWS)
-#include <SDL3/SDL.h>
-
-#define EUZEBIA3D_WINDOWS_TARGET_FPS 24u
-
-int require_pointer(const void *pointer, const char *name)
-{
-    if (pointer != NULL)
-    {
-        return 1;
-    }
-
-    SDL_Log("%s failed", name);
-    return 0;
-}
-
-int process_window_events(void)
-{
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-        if (event.type == SDL_EVENT_QUIT)
-        {
-            return 0;
-        }
-        if (event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_ESCAPE)
-        {
-            return 0;
-        }
-    }
-
-    return 1;
-}
-
-void cap_window_frame_rate(uint64_t frame_begin_ticks)
-{
-    uint64_t performance_frequency = SDL_GetPerformanceFrequency();
-    if (performance_frequency == 0u || EUZEBIA3D_WINDOWS_TARGET_FPS == 0u)
-    {
-        return;
-    }
-
-    uint64_t target_frame_ticks = performance_frequency / EUZEBIA3D_WINDOWS_TARGET_FPS;
-    uint64_t elapsed_ticks = SDL_GetPerformanceCounter() - frame_begin_ticks;
-    if (elapsed_ticks >= target_frame_ticks)
-    {
-        return;
-    }
-
-    uint64_t remaining_ticks = target_frame_ticks - elapsed_ticks;
-    uint64_t remaining_ns = (remaining_ticks * 1000000000ull) / performance_frequency;
-    if (remaining_ns > 0u)
-    {
-        SDL_DelayPrecise(remaining_ns);
-    }
-}
-#endif
-
-void animate_curtain(e3d_EngineContext *engine_ctx, const e3d_Sprite *curtain[], int t, uint16_t bands)
-{
-    const int16_t base_x = -55;
-    const uint16_t max_amp = 6;
-    const uint16_t speed = 500;
-    const uint16_t phase_step = 700;
-    uint32_t base_phase;
-
-    if (engine_ctx == NULL || curtain == NULL || bands == 0u)
-    {
-        return;
-    }
-
-    base_phase = (uint32_t)(t * speed) % TABLE_SIZE;
-    for (uint16_t i = 0; i < bands; i++)
-    {
-        int16_t amp = (bands > 1u) ? (int16_t)((i * max_amp) / (bands - 1u)) : 0;
-        uint32_t phase = (base_phase + i * phase_step) % TABLE_SIZE;
-        int16_t wave = fast_sin((int32_t)phase);
-        int16_t offset = (int16_t)(((int32_t)wave * amp) >> 10);
-        e3d_Painter_DrawSprite(engine_ctx, curtain[i], offset + base_x, curtain[i]->height * i, 0, 1);
-    }
-}
+#include "grid.h"
 
 #define EUZEBIA3D_DISPLAY_HEIGHT 240
 
@@ -270,7 +188,7 @@ static void grid_draw_horizontal_line(e3d_EngineContext *engine_ctx, e3d_Point s
     e3d_Painter_DrawLine(engine_ctx, &clipped_start, &clipped_end, color);
 }
 
-void draw_grid(e3d_EngineContext *engine_ctx, int16_t x, int16_t y, uint16_t height, uint16_t width, uint16_t color, uint8_t linesNum, uint8_t offset, int16_t offsetX, int16_t offsetY, int t, uint8_t direction)
+static void draw_grid_values(e3d_EngineContext *engine_ctx, int16_t x, int16_t y, uint16_t height, uint16_t width, uint16_t color, uint8_t linesNum, uint8_t offset, int16_t offsetX, int16_t offsetY, int t, uint8_t direction)
 {
     if (engine_ctx == NULL || linesNum == 0u || width == 0u || height == 0u)
         return;
@@ -298,35 +216,35 @@ void draw_grid(e3d_EngineContext *engine_ctx, int16_t x, int16_t y, uint16_t hei
         .y = (int16_t)(gridY + height - 1u),
     };
 
-    if (direction == GRID_MOVE_DOWN)
+    if (direction == GRID_DIRECTION_DOWN)
     {
         bottomLeft.x -= offset;
         bottomRight.x += offset;
     }
-    else if (direction == GRID_MOVE_UP)
+    else if (direction == GRID_DIRECTION_UP)
     {
         topLeft.x -= offset;
         topRight.x += offset;
     }
-    else if (direction == GRID_MOVE_LEFT)
+    else if (direction == GRID_DIRECTION_LEFT)
     {
         topLeft.y -= offset;
         bottomLeft.y += offset;
     }
-    else if (direction == GRID_MOVE_RIGHT)
+    else if (direction == GRID_DIRECTION_RIGHT)
     {
         topRight.y -= offset;
         bottomRight.y += offset;
     }
 
-    uint8_t moveVertical = direction == GRID_MOVE_LEFT || direction == GRID_MOVE_RIGHT;
+    uint8_t moveVertical = direction == GRID_DIRECTION_LEFT || direction == GRID_DIRECTION_RIGHT;
     for (uint8_t i = 0; i < linesNum; i++)
     {
         e3d_Point top;
         e3d_Point bottom;
         if (moveVertical)
         {
-            uint16_t position = grid_wrapped_position(width, i, linesNum, t, direction == GRID_MOVE_LEFT);
+            uint16_t position = grid_wrapped_position(width, i, linesNum, t, direction == GRID_DIRECTION_LEFT);
             top = grid_lerp_point(topLeft, topRight, position, width);
             bottom = grid_lerp_point(bottomLeft, bottomRight, position, width);
         }
@@ -345,14 +263,14 @@ void draw_grid(e3d_EngineContext *engine_ctx, int16_t x, int16_t y, uint16_t hei
         }
     }
 
-    uint8_t moveHorizontal = direction == GRID_MOVE_DOWN || direction == GRID_MOVE_UP;
+    uint8_t moveHorizontal = direction == GRID_DIRECTION_DOWN || direction == GRID_DIRECTION_UP;
     for (uint8_t i = 0; i < linesNum; i++)
     {
         e3d_Point left;
         e3d_Point right;
         if (moveHorizontal)
         {
-            uint16_t position = grid_wrapped_position(height, i, linesNum, t, direction == GRID_MOVE_UP);
+            uint16_t position = grid_wrapped_position(height, i, linesNum, t, direction == GRID_DIRECTION_UP);
             left = grid_lerp_point(topLeft, bottomLeft, position, height);
             right = grid_lerp_point(topRight, bottomRight, position, height);
         }
@@ -376,8 +294,16 @@ void draw_grid(e3d_EngineContext *engine_ctx, int16_t x, int16_t y, uint16_t hei
     }
 }
 
-int16_t wave_offset(uint32_t t, uint16_t speed, uint32_t phase, int16_t amplitude)
+void draw_grid(e3d_EngineContext *engine_ctx, const GridConfig *config,
+               uint32_t frame)
 {
-    uint32_t wave_phase = (((t % TABLE_SIZE) * (uint32_t)speed) + phase) % TABLE_SIZE;
-    return (int16_t)(((int32_t)fast_sin((int32_t)wave_phase) * amplitude) >> 10);
+    if (config == NULL)
+    {
+        return;
+    }
+
+    draw_grid_values(engine_ctx, config->x, config->y, config->height,
+                     config->width, config->color, config->line_count,
+                     config->perspective_offset, config->offset_x,
+                     config->offset_y, (int)frame, (uint8_t)config->direction);
 }
