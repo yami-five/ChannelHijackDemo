@@ -6,10 +6,10 @@
 
 #if defined(PLATFORM_WINDOWS)
 typedef struct {
-    bool running;
-    bool paused;
-    uint32_t target_fps;
-    uint64_t frame_begin_ticks;
+  bool running;
+  bool paused;
+  uint32_t target_fps;
+  uint64_t frame_begin_ticks;
 } SdlApplication;
 
 bool sdl_application_init(SdlApplication *application, uint32_t target_fps);

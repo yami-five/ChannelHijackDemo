@@ -72,12 +72,25 @@ endif()
 add_executable(ChannelHijackDemo
     ChannelHijackDemo.c
     libs/animation/animation.c
+    libs/demo_context/demo_context.c
+    libs/demo_context/scenes/scene_1_tv_off.c
+    libs/demo_context/scenes/scene_2_program_in.c
+    libs/demo_context/scenes/scene_3_program_out.c
+    libs/demo_context/scenes/scene_4_weather_in.c
+    libs/demo_context/scenes/scene_5_weather_out.c
+    libs/demo_context/scenes/scene_6_news_in.c
+    libs/demo_context/scenes/scene_7_news_out.c
+    libs/demo_context/scenes/scene_8_hijacking_in.c
+    libs/demo_context/scenes/scene_9_hijacking_out.c
+    libs/demo_context/scenes/scene_10_alert_in.c
+    libs/demo_context/scenes/scene_11_alert_out.c
     libs/grid/grid.c
     libs/sdl_wrapper/sdl_wrapper.c
 )
 target_include_directories(ChannelHijackDemo PRIVATE
     "${CMAKE_CURRENT_LIST_DIR}"
     "${CMAKE_CURRENT_LIST_DIR}/libs/animation"
+    "${CMAKE_CURRENT_LIST_DIR}/libs/demo_context"
     "${CMAKE_CURRENT_LIST_DIR}/libs/grid"
     "${CMAKE_CURRENT_LIST_DIR}/libs/sdl_wrapper"
 )
