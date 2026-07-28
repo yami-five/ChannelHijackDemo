@@ -2,6 +2,7 @@
 #include "demo_scene.h"
 #include "scenes/scene_10_alert_in.h"
 #include "scenes/scene_11_alert_out.h"
+#include "scenes/scene_12_space.h"
 #include "scenes/scene_1_tv_off.h"
 #include "scenes/scene_2_program_in.h"
 #include "scenes/scene_3_program_out.h"
@@ -20,7 +21,7 @@
 #include "pico/time.h"
 #endif
 
-#define DEMO_SCENES_COUNT 11u
+#define DEMO_SCENES_COUNT 12u
 
 static e3d_EngineContext engine;
 static DemoSceneContext *scenes[DEMO_SCENES_COUNT];
@@ -93,10 +94,11 @@ void run_demo(void) {
   scenes[8] = scene_9_hijacking_out_get_context();
   scenes[9] = scene_10_alert_in_get_context();
   scenes[10] = scene_11_alert_out_get_context();
+  scenes[11] = scene_12_space_get_context();
   demo_ctx.scenes_count = DEMO_SCENES_COUNT;
   demo_ctx.scenes = scenes;
 
-  for (demo_ctx.active_scene_index = 0u;
+  for (demo_ctx.active_scene_index = 11u;
        demo_ctx.active_scene_index < demo_ctx.scenes_count && demo_is_running();
        demo_ctx.active_scene_index++) {
     DemoSceneContext *scene =

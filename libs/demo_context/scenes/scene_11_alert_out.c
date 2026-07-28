@@ -9,7 +9,7 @@ static DemoSceneContext scene_ctx = {
     .scene_frame = 0u,
     .scene_elapsed_ms = 0u,
     .scene_start_time_ms = 0u,
-    .scene_duration = 0u,
+    .scene_duration = 60u,
     .run_scene = run_scene,
 };
 static const e3d_Sprite *alert_small;
