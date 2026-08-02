@@ -47,7 +47,7 @@ static bool load_assets(e3d_EngineContext *engine_ctx) {
                           MODEL_TRANSFORM_SCALE) ||
       !add_mesh_transformation(engine_ctx, assets.bug, 0.0f, 0.0f, 0.0f, 0.0f,
                           MODEL_TRANSFORM_ROTATE) ||
-      !add_mesh_transformation(engine_ctx, assets.bug, 0.0f, 3.0f, 1.0f, -3.0f,
+      !add_mesh_transformation(engine_ctx, assets.bug, 0.0f, 5.0f, -1.0f, -5.0f,
                           MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
@@ -60,7 +60,7 @@ static bool load_assets(e3d_EngineContext *engine_ctx) {
                           MODEL_TRANSFORM_SCALE) ||
       !add_mesh_transformation(engine_ctx, assets.earth, 0.0f, 0.0f, 0.0f, 0.0f,
                           MODEL_TRANSFORM_ROTATE) ||
-      !add_mesh_transformation(engine_ctx, assets.earth, 0.0f, -2.0f, 0.0f, 2.0f,
+      !add_mesh_transformation(engine_ctx, assets.earth, 0.0f, 0.0f, -2.0f, 0.0f,
                           MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
@@ -79,7 +79,7 @@ static bool load_assets(e3d_EngineContext *engine_ctx) {
                           MODEL_TRANSFORM_TRANSLATE) ||
       !add_mesh_transformation(engine_ctx, assets.moon, 0.0f, 0.0f, 0.0f, 0.0f,
                           MODEL_TRANSFORM_ROTATE) ||
-      !add_mesh_transformation(engine_ctx, assets.moon, 0.0f, -2.0f, 0.0f, 2.0f,
+      !add_mesh_transformation(engine_ctx, assets.moon, 0.0f, 0.0f, -2.0f, 0.0f,
                           MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
