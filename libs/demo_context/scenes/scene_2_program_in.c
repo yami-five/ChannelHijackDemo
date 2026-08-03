@@ -3,6 +3,7 @@
 #include "../demo_scene.h"
 #include "grid.h"
 #include "scene_tv.h"
+#include "storage/gfx_indices.h"
 
 typedef struct {
   const e3d_Sprite *segment_zero;
@@ -74,7 +75,7 @@ static void run_scene(DemoContext *demo_ctx) {
 
   demo_begin_frame();
 
-  e3d_Painter_DrawImage(engine_ctx, 0u);
+  e3d_Painter_DrawImage(engine_ctx, GFX_TEXTURE_TV_BIG);
   e3d_Painter_DrawGradient(engine_ctx, 0x01a2, 0x1ec7, &program_rect, UP);
   draw_grid(engine_ctx, &program_grid, frame);
 

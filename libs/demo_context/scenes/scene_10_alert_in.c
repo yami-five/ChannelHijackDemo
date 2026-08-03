@@ -2,6 +2,7 @@
 #include "../demo_scene.h"
 #include "scene_10_alert_in.h"
 #include "scene_tv.h"
+#include "storage/gfx_indices.h"
 
 static void run_scene(DemoContext *demo_ctx);
 static DemoSceneContext scene_ctx = {
@@ -36,7 +37,7 @@ static void run_scene(DemoContext *demo_ctx) {
           scene_ctx.scene_frame < scene_ctx.scene_duration)) {
   uint32_t f = scene_ctx.scene_frame;
   if (f == 0u) scene_ctx.scene_start_time_ms = demo_platform_time_ms();
-  demo_begin_frame(); e3d_Painter_DrawImage(ctx, 0u);
+  demo_begin_frame(); e3d_Painter_DrawImage(ctx, GFX_TEXTURE_TV_BIG);
   e3d_Painter_DrawSprite(ctx, background, 44, 1, 0, 1);
   e3d_Painter_DrawSprite(ctx, parts[0], 44, 31, 0, 1);
   e3d_Painter_DrawSprite(ctx, parts[3], 152, 105, 0, 1);

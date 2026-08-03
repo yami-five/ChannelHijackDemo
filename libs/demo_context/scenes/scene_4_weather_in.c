@@ -2,6 +2,7 @@
 #include "../demo_scene.h"
 #include "scene_4_weather_in.h"
 #include "scene_tv.h"
+#include "storage/gfx_indices.h"
 
 typedef struct {
   uint8_t sprite_index;
@@ -63,7 +64,7 @@ static void run_scene(DemoContext *demo_ctx) {
   uint32_t frame = scene_ctx.scene_frame;
   if (frame == 0u) scene_ctx.scene_start_time_ms = demo_platform_time_ms();
   demo_begin_frame();
-  e3d_Painter_DrawImage(engine_ctx, 0u);
+  e3d_Painter_DrawImage(engine_ctx, GFX_TEXTURE_TV_BIG);
   if (frame >= 5u && frame < 10u) {
     e3d_Painter_DrawPlasma(engine_ctx, noise_colors, 4u, frame, 2, 3, 4, 5, 3,
                            &plasma_rect);

@@ -2,6 +2,7 @@
 #include "../demo_scene.h"
 #include "scene_11_alert_out.h"
 #include "animation.h"
+#include "storage/gfx_indices.h"
 
 #define CURTAIN_LENGTH 20u
 static void run_scene(DemoContext *demo_ctx);
@@ -34,7 +35,7 @@ static void run_scene(DemoContext *demo_ctx) {
           scene_ctx.scene_frame < scene_ctx.scene_duration)) {
   uint32_t f = scene_ctx.scene_frame;
   if (f == 0u) scene_ctx.scene_start_time_ms = demo_platform_time_ms();
-  demo_begin_frame(); e3d_Painter_DrawImage(ctx, 1u);
+  demo_begin_frame(); e3d_Painter_DrawImage(ctx, GFX_TEXTURE_TV);
   e3d_Painter_DrawSprite(ctx, alert_small, 91, 76, 0, 1);
   draw_sprite_wave(ctx, curtain, CURTAIN_LENGTH, f, &curtain_animation);
   finish(); demo_end_frame();

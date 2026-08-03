@@ -2,6 +2,7 @@
 #include "../demo_scene.h"
 #include "scene_6_news_in.h"
 #include "scene_tv.h"
+#include "storage/gfx_indices.h"
 
 typedef struct {
   const e3d_Sprite *agro_main;
@@ -62,7 +63,7 @@ static void run_scene(DemoContext *demo_ctx) {
           scene_ctx.scene_frame < scene_ctx.scene_duration)) {
   uint32_t f = scene_ctx.scene_frame;
   if (f == 0u) scene_ctx.scene_start_time_ms = demo_platform_time_ms();
-  demo_begin_frame(); e3d_Painter_DrawImage(ctx, 0u);
+  demo_begin_frame(); e3d_Painter_DrawImage(ctx, GFX_TEXTURE_TV_BIG);
   if ((f >= 5u && f < 10u) || (f >= 30u && f < 35u) ||
       (f >= 45u && f < 50u)) {
     e3d_Painter_DrawPlasma(ctx, noise_colors, 4u, f, 2, 3, 4, 5, 3, &plasma_rect);

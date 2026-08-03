@@ -3,6 +3,7 @@
 #include "../demo_scene.h"
 #include "animation.h"
 #include "fpa.h"
+#include "storage/gfx_indices.h"
 
 #define CURTAIN_LENGTH 20u
 
@@ -76,7 +77,7 @@ static void run_scene(DemoContext *demo_ctx) {
 
   demo_begin_frame();
 
-  e3d_Painter_DrawImage(engine_ctx, 1u);
+  e3d_Painter_DrawImage(engine_ctx, GFX_TEXTURE_TV);
   e3d_Painter_DrawSprite(engine_ctx, assets.tv_off, 91, 76, 0, 1);
   draw_sprite_wave(engine_ctx, assets.curtain, CURTAIN_LENGTH, frame,
                    &curtain_animation);

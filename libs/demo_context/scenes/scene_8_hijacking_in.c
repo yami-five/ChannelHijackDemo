@@ -2,6 +2,7 @@
 #include "../demo_scene.h"
 #include "scene_8_hijacking_in.h"
 #include "scene_tv.h"
+#include "storage/gfx_indices.h"
 
 static void run_scene(DemoContext *demo_ctx);
 static DemoSceneContext scene_ctx = {
@@ -53,7 +54,7 @@ static void run_scene(DemoContext *demo_ctx) {
           scene_ctx.scene_frame < scene_ctx.scene_duration)) {
   uint32_t f = scene_ctx.scene_frame;
   if (f == 0u) scene_ctx.scene_start_time_ms = demo_platform_time_ms();
-  demo_begin_frame(); e3d_Painter_DrawImage(ctx, 0u);
+  demo_begin_frame(); e3d_Painter_DrawImage(ctx, GFX_TEXTURE_TV_BIG);
   if (f <= 15u) draw_digits(ctx, 0u, 4u);
   if (f < 15u) {
     e3d_Painter_DrawSprite(ctx, tv_bug, 44, 1, 0, 1);
