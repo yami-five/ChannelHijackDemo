@@ -2,4 +2,5 @@ build*/**
 !.vscode/*
 assets/*
 tools/*
-!tools/blender_transform_converter.py
+!tools/*.py
+!tools/*.ps1
