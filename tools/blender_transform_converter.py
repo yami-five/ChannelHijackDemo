@@ -10,10 +10,10 @@ from collections.abc import Sequence
 bl_info = {
     "name": "Euzebia3D Transform Copier",
     "author": "Euzebia3D",
-    "version": (1, 3, 0),
+    "version": (1, 4, 0),
     "blender": (3, 6, 0),
     "location": "3D View > Sidebar > Euzebia3D",
-    "description": "Copy the selected object's transform as Euzebia3D C code",
+    "description": "Copy object transforms and cameras as Euzebia3D C code",
     "category": "3D View",
 }
 
@@ -164,6 +164,30 @@ def generate_c_snippet(
     return "\n".join(lines)
 
 
+def generate_camera_c_snippet(
+    camera: str,
+    location: Vector3,
+    target_location: Vector3,
+) -> str:
+    camera = camera.strip()
+    if not camera:
+        raise ValueError("Camera expression cannot be empty.")
+
+    camera_x, camera_y, camera_z = map(
+        _format_c_float, blender_location_to_engine(location)
+    )
+    target_x, target_y, target_z = map(
+        _format_c_float, blender_location_to_engine(target_location)
+    )
+    return "\n".join(
+        (
+            f"{camera} = e3d_Camera_CreateCamera(",
+            f"    engine_ctx, {camera_x}, {camera_y}, {camera_z},",
+            f"    {target_x}, {target_y}, {target_z}, 0.0f, 1.0f, 0.0f);",
+        )
+    )
+
+
 def run_gui(
     initial_location: Vector3 = (0.0, 0.0, 0.0),
     initial_rotation: Quaternion = (1.0, 0.0, 0.0, 0.0),
@@ -307,13 +331,35 @@ except ImportError:
 
 
 if bpy is not None:
+    from mathutils import Vector
+
+    TRACKING_CONSTRAINT_TYPES = {"TRACK_TO", "DAMPED_TRACK", "LOCKED_TRACK"}
+
+
+    def _camera_target(obj):
+        for constraint in obj.constraints:
+            if (
+                constraint.type in TRACKING_CONSTRAINT_TYPES
+                and not constraint.mute
+                and constraint.influence > 0.0
+                and constraint.target is not None
+            ):
+                return constraint.target, tuple(
+                    constraint.target.matrix_world.translation
+                )
+
+        camera_location = obj.matrix_world.translation
+        camera_forward = obj.matrix_world.to_quaternion() @ Vector(
+            (0.0, 0.0, -1.0)
+        )
+        return None, tuple(camera_location + camera_forward)
 
     class EUZEBIA3D_OT_copy_transform(bpy.types.Operator):
         bl_idname = "euzebia3d.copy_transform"
         bl_label = "Copy Transform as C Code"
         bl_description = (
-            "Convert the active object's local transform and copy Euzebia3D "
-            "C calls to the system clipboard"
+            "Copy an object's transform or a camera's location and target "
+            "as Euzebia3D C code"
         )
         bl_options = {"REGISTER"}
 
@@ -323,6 +369,29 @@ if bpy is not None:
 
         def execute(self, context):
             obj = context.active_object
+            if obj.type == "CAMERA":
+                camera_expression = obj.euzebia3d_camera_expression.strip()
+                if not camera_expression:
+                    camera_expression = (
+                        f"assets.{_object_name_to_c_identifier(obj.name)}"
+                    )
+
+                target, target_location = _camera_target(obj)
+                snippet = generate_camera_c_snippet(
+                    camera=camera_expression,
+                    location=tuple(obj.matrix_world.translation),
+                    target_location=target_location,
+                )
+                context.window_manager.clipboard = snippet
+                target_description = (
+                    target.name if target is not None else "forward direction"
+                )
+                self.report(
+                    {"INFO"},
+                    f"Copied camera {obj.name} with target {target_description}",
+                )
+                return {"FINISHED"}
+
             location, rotation, scale = obj.matrix_basis.decompose()
             mesh_expression = obj.euzebia3d_mesh_expression.strip()
             if not mesh_expression:
@@ -362,12 +431,27 @@ if bpy is not None:
                 return
 
             layout.label(text=f"Object: {obj.name}")
-            layout.prop(obj, "euzebia3d_mesh_expression", text="C mesh")
-            if not obj.euzebia3d_mesh_expression.strip():
-                default_mesh = f"assets.{_object_name_to_c_identifier(obj.name)}"
-                layout.label(text=f"Default: {default_mesh}")
-            layout.prop(obj, "euzebia3d_include_scale", text="Include scale")
-            layout.prop(obj, "euzebia3d_geometry_axes", text="OBJ axes")
+            if obj.type == "CAMERA":
+                layout.prop(obj, "euzebia3d_camera_expression", text="C camera")
+                if not obj.euzebia3d_camera_expression.strip():
+                    default_camera = (
+                        f"assets.{_object_name_to_c_identifier(obj.name)}"
+                    )
+                    layout.label(text=f"Default: {default_camera}")
+                target, _ = _camera_target(obj)
+                if target is not None:
+                    layout.label(text=f"Target: {target.name}")
+                else:
+                    layout.label(text="Target: camera forward axis (-Z)")
+            else:
+                layout.prop(obj, "euzebia3d_mesh_expression", text="C mesh")
+                if not obj.euzebia3d_mesh_expression.strip():
+                    default_mesh = (
+                        f"assets.{_object_name_to_c_identifier(obj.name)}"
+                    )
+                    layout.label(text=f"Default: {default_mesh}")
+                layout.prop(obj, "euzebia3d_include_scale", text="Include scale")
+                layout.prop(obj, "euzebia3d_geometry_axes", text="OBJ axes")
             layout.operator(
                 EUZEBIA3D_OT_copy_transform.bl_idname,
                 icon="COPYDOWN",
@@ -389,6 +473,13 @@ def register() -> None:
     bpy.types.Object.euzebia3d_mesh_expression = bpy.props.StringProperty(
         name="C mesh expression",
         description="Expression passed as the mesh argument; empty uses assets.<object name>",
+        default="",
+    )
+    bpy.types.Object.euzebia3d_camera_expression = bpy.props.StringProperty(
+        name="C camera expression",
+        description=(
+            "Expression assigned the created camera; empty uses assets.<object name>"
+        ),
         default="",
     )
     bpy.types.Object.euzebia3d_include_scale = bpy.props.BoolProperty(
@@ -423,6 +514,7 @@ def unregister() -> None:
 
     for blender_class in reversed(BLENDER_CLASSES):
         bpy.utils.unregister_class(blender_class)
+    del bpy.types.Object.euzebia3d_camera_expression
     del bpy.types.Object.euzebia3d_geometry_axes
     del bpy.types.Object.euzebia3d_include_scale
     del bpy.types.Object.euzebia3d_mesh_expression

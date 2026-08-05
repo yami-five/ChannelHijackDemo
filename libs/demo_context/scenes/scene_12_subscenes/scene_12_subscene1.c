@@ -18,13 +18,13 @@ typedef struct {
   e3d_Material *maggot_material;
   e3d_Material *satelite_material;
   e3d_Mesh *satelite;
-  e3d_Camera *camera1;
+  e3d_Camera *camera;
 } Scene12Subscene1Assets;
 
 static bool load_assets_subscene1(e3d_EngineContext *engine_ctx,
                                   SpaceSceneAssets *assets,
                                   Scene12Subscene1Assets *subscene_assets) {
-  if (subscene_assets->camera1 != NULL) {
+  if (subscene_assets->camera != NULL) {
     return true;
   }
 
@@ -94,20 +94,20 @@ static bool load_assets_subscene1(e3d_EngineContext *engine_ctx,
     return false;
   }
 
-  subscene_assets->camera1 = e3d_Camera_CreateCamera(
+  subscene_assets->camera = e3d_Camera_CreateCamera(
       engine_ctx, -2.1803f, 0.54145f, 6.0279f, -1.8314f, 0.062086f, 5.0865f,
       0.0f, 1.0f, 0.0f);
-  if (subscene_assets->camera1 == NULL) {
+  if (subscene_assets->camera == NULL) {
     return false;
   }
-  if (e3d_Camera_AddTransformation(engine_ctx, subscene_assets->camera1, 0.0f,
+  if (e3d_Camera_AddTransformation(engine_ctx, subscene_assets->camera, 0.0f,
                                    -0.152247f, 0.209179f, 0.41079f,
                                    CAMERA_TRANSFORM_TRANSLATE) == NULL) {
     return false;
   }
 
   e3d_Renderer_SetLight(engine_ctx, assets->light);
-  e3d_Renderer_SetCamera(engine_ctx, subscene_assets->camera1);
+  e3d_Renderer_SetCamera(engine_ctx, subscene_assets->camera);
   return true;
 }
 
@@ -121,7 +121,7 @@ static void unload_assets_subscene1(e3d_EngineContext *engine_ctx,
   e3d_Material_DeleteMat(engine_ctx, &subscene_assets->maggot_material);
   e3d_Material_DeleteMat(engine_ctx, &subscene_assets->satelite_material);
 
-  e3d_Camera_DeleteCamera(engine_ctx, &subscene_assets->camera1);
+  e3d_Camera_DeleteCamera(engine_ctx, &subscene_assets->camera);
 }
 
 static void end_scene_frame(DemoSceneContext *scene_ctx) {
@@ -161,7 +161,7 @@ static void render_scene_frame(e3d_EngineContext *engine_ctx,
 
   e3d_Renderer_CleanScene(engine_ctx);
   e3d_Renderer_AddModelToScene(engine_ctx, assets->earth);
-  e3d_Renderer_AddModelToScene(engine_ctx, assets->moon);
+  // e3d_Renderer_AddModelToScene(engine_ctx, assets->moon);
   // e3d_Renderer_AddModelToScene(engine_ctx, assets->bug);
   e3d_Renderer_AddModelToScene(engine_ctx, subscene_assets->maggot1);
   e3d_Renderer_AddModelToScene(engine_ctx, subscene_assets->maggot2);
@@ -207,7 +207,7 @@ void scene_12_subscene1_run_scene(DemoContext *demo_ctx,
        scene_should_continue(scene_ctx);
        camera_frame++) {
     demo_begin_frame();
-    e3d_Camera_UpdateCamera(engine_ctx, subscene_assets.camera1);
+    e3d_Camera_UpdateCamera(engine_ctx, subscene_assets.camera);
     render_scene_frame(engine_ctx, scene_ctx, assets, &subscene_assets);
   }
 
