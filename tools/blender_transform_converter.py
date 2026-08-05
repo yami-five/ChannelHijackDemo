@@ -54,6 +54,7 @@ def _quaternion_multiply(left: Quaternion, right: Quaternion) -> Quaternion:
 def blender_quaternion_to_engine_axis_angle(
     rotation: Quaternion,
     geometry_in_engine_axes: bool = False,
+    apply_basis_rotation: bool = True,
 ) -> tuple[float, Vector3]:
     """Convert Blender quaternion to engine angle-in-turns and rotation axis."""
     w, x, y, z = rotation
@@ -63,14 +64,16 @@ def blender_quaternion_to_engine_axis_angle(
 
     blender_rotation = (w / length, x / length, y / length, z / length)
 
-    half_sqrt_two = math.sqrt(0.5)
-    basis_rotation = (half_sqrt_two, -half_sqrt_two, 0.0, 0.0)
-    engine_rotation = _quaternion_multiply(basis_rotation, blender_rotation)
-    if geometry_in_engine_axes:
-        basis_rotation_inverse = (half_sqrt_two, half_sqrt_two, 0.0, 0.0)
-        engine_rotation = _quaternion_multiply(
-            engine_rotation, basis_rotation_inverse
-        )
+    engine_rotation = blender_rotation
+    if apply_basis_rotation:
+        half_sqrt_two = math.sqrt(0.5)
+        basis_rotation = (half_sqrt_two, -half_sqrt_two, 0.0, 0.0)
+        engine_rotation = _quaternion_multiply(basis_rotation, blender_rotation)
+        if geometry_in_engine_axes:
+            basis_rotation_inverse = (half_sqrt_two, half_sqrt_two, 0.0, 0.0)
+            engine_rotation = _quaternion_multiply(
+                engine_rotation, basis_rotation_inverse
+            )
 
     # Euzebia3D's reversed quaternion product applies the inverse rotation.
     # Conjugating here makes the result match Blender's active rotation.

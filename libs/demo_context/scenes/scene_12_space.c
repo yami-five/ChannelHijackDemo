@@ -1,12 +1,15 @@
 #include "scene_12_space.h"
 #include "../demo_context.h"
 #include "../demo_scene.h"
-
 #include "engineApi.h"
+#include "model_animation.h"
+#include "scene_12_animations.inc"
 #include "scene_12_star_field.inc"
 #include "storage/gfx_indices.h"
 
+
 #define CAMERA_PULL_BACK_FRAMES 10u
+#define MAGGOT_ANIMATION_TRANSFORM_INDEX 0u
 
 typedef struct {
   e3d_Mesh *bug;
@@ -43,12 +46,12 @@ static bool load_assets(e3d_EngineContext *engine_ctx) {
   assets.bug =
       e3d_Mesh_CreateMesh(engine_ctx, bug_material, GFX_MODEL_BUG_SHIP);
   if (assets.bug == NULL ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, 0.8f, 0.8f, 0.8f,
-                               MODEL_TRANSFORM_SCALE) ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, 0.0f, 0.0f, 0.0f,
-                               MODEL_TRANSFORM_ROTATE) ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, 5.0f, -1.0f, -5.0f,
-                               MODEL_TRANSFORM_TRANSLATE)) {
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, 0.8f, 0.8f,
+                                  0.8f, MODEL_TRANSFORM_SCALE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, 0.0f, 0.0f,
+                                  0.0f, MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, 5.0f, -1.0f,
+                                  -5.0f, MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
 
@@ -57,12 +60,12 @@ static bool load_assets(e3d_EngineContext *engine_ctx) {
   assets.earth =
       e3d_Mesh_CreateMesh(engine_ctx, earth_material, GFX_MODEL_SPHERE);
   if (assets.earth == NULL ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.earth, 0.0f, 0.8f, 0.8f, 0.8f,
-                               MODEL_TRANSFORM_SCALE) ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.earth, 0.0f, 0.0f, 0.0f, 0.0f,
-                               MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.earth, 0.0f, 0.8f, 0.8f,
+                                  0.8f, MODEL_TRANSFORM_SCALE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.earth, 0.0f, 0.0f, 0.0f,
+                                  0.0f, MODEL_TRANSFORM_ROTATE) ||
       !e3d_Mesh_AddTransformation(engine_ctx, assets.earth, 0.0f, 0.0f, -2.0f,
-                               0.0f, MODEL_TRANSFORM_TRANSLATE)) {
+                                  0.0f, MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
 
@@ -71,18 +74,18 @@ static bool load_assets(e3d_EngineContext *engine_ctx) {
   assets.moon =
       e3d_Mesh_CreateMesh(engine_ctx, moon_material, GFX_MODEL_SPHERE);
   if (assets.moon == NULL ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.moon, 0.0f, 0.8f, 0.8f, 0.8f,
-                               MODEL_TRANSFORM_SCALE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.moon, 0.0f, 0.8f, 0.8f,
+                                  0.8f, MODEL_TRANSFORM_SCALE) ||
       !e3d_Mesh_AddTransformation(engine_ctx, assets.moon, 0.0f, 0.273f, 0.273f,
-                               0.273f, MODEL_TRANSFORM_SCALE) ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.moon, 0.0f, 0.0f, 0.0f, 0.0f,
-                               MODEL_TRANSFORM_ROTATE) ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.moon, 0.0f, -7.0f, 0.0f, 0.0f,
-                               MODEL_TRANSFORM_TRANSLATE) ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.moon, 0.0f, 0.0f, 0.0f, 0.0f,
-                               MODEL_TRANSFORM_ROTATE) ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.moon, 0.0f, 0.0f, -2.0f, 0.0f,
-                               MODEL_TRANSFORM_TRANSLATE)) {
+                                  0.273f, MODEL_TRANSFORM_SCALE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.moon, 0.0f, 0.0f, 0.0f,
+                                  0.0f, MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.moon, 0.0f, -7.0f, 0.0f,
+                                  0.0f, MODEL_TRANSFORM_TRANSLATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.moon, 0.0f, 0.0f, 0.0f,
+                                  0.0f, MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.moon, 0.0f, 0.0f, -2.0f,
+                                  0.0f, MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
 
@@ -91,37 +94,40 @@ static bool load_assets(e3d_EngineContext *engine_ctx) {
   assets.maggot1 =
       e3d_Mesh_CreateMesh(engine_ctx, maggot_material, GFX_MODEL_MAGGOT);
   if (assets.maggot1 == NULL ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.maggot1, 0.0f, 0.0f, 1.0f,
+                                  0.0f, MODEL_TRANSFORM_ROTATE) ||
       !e3d_Mesh_AddTransformation(engine_ctx, assets.maggot1, 0.3742155f,
-                               0.0957482f, -0.9931533f, 0.0669243f,
-                               MODEL_TRANSFORM_ROTATE) ||
+                                  0.0957482f, -0.9931533f, 0.0669243f,
+                                  MODEL_TRANSFORM_ROTATE) ||
       !e3d_Mesh_AddTransformation(engine_ctx, assets.maggot1, 0.0f, -1.8568504f,
-                               0.120001f, 5.1299009f,
-                               MODEL_TRANSFORM_TRANSLATE) /*||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.maggot1, 0.350094f,
-                               0.9980992f, -0.043578f, -0.043578f,
-                               MODEL_TRANSFORM_ROTATE)*/) {
+                                  0.120001f, 5.1299009f,
+                                  MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
   assets.maggot2 =
       e3d_Mesh_CreateMesh(engine_ctx, maggot_material, GFX_MODEL_MAGGOT);
   if (assets.maggot2 == NULL ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.maggot2, 0.0f, 0.0f, 1.0f,
+                                  0.0f, MODEL_TRANSFORM_ROTATE) ||
       !e3d_Mesh_AddTransformation(engine_ctx, assets.maggot2, 0.6292018f,
-                               -0.2800575f, 0.1509732f, 0.9480374f,
-                               MODEL_TRANSFORM_ROTATE) ||
+                                  -0.2800575f, 0.1509732f, 0.9480374f,
+                                  MODEL_TRANSFORM_ROTATE) ||
       !e3d_Mesh_AddTransformation(engine_ctx, assets.maggot2, 0.0f, -1.8095753f,
-                               0.0198577f, 5.1291432f,
-                               MODEL_TRANSFORM_TRANSLATE)) {
+                                  0.0198577f, 5.1291432f,
+                                  MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
   assets.maggot3 =
       e3d_Mesh_CreateMesh(engine_ctx, maggot_material, GFX_MODEL_MAGGOT);
   if (assets.maggot3 == NULL ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.maggot3, 0.0f, 0.0f, 1.0f,
+                                  0.0f, MODEL_TRANSFORM_ROTATE) ||
       !e3d_Mesh_AddTransformation(engine_ctx, assets.maggot3, 0.3488846f,
-                               -0.53497f, 0.5282924f, 0.6593286f,
-                               MODEL_TRANSFORM_ROTATE) ||
+                                  -0.53497f, 0.5282924f, 0.6593286f,
+                                  MODEL_TRANSFORM_ROTATE) ||
       !e3d_Mesh_AddTransformation(engine_ctx, assets.maggot3, 0.0f, -1.7636162f,
-                               0.118544f, 5.094625f,
-                               MODEL_TRANSFORM_TRANSLATE)) {
+                                  0.118544f, 5.094625f,
+                                  MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
 
@@ -131,10 +137,10 @@ static bool load_assets(e3d_EngineContext *engine_ctx) {
       e3d_Mesh_CreateMesh(engine_ctx, satelite_material, GFX_MODEL_SATELLITE);
   if (assets.satelite == NULL ||
       !e3d_Mesh_AddTransformation(engine_ctx, assets.satelite, 0.5692173f, 0.0f,
-                               1.0f, 0.0f, MODEL_TRANSFORM_ROTATE) ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.satelite, 0.0f, -1.8313992f,
-                               0.062086f, 5.086524f,
-                               MODEL_TRANSFORM_TRANSLATE)) {
+                                  1.0f, 0.0f, MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.satelite, 0.0f,
+                                  -1.8313992f, 0.062086f, 5.086524f,
+                                  MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
 
@@ -149,8 +155,8 @@ static bool load_assets(e3d_EngineContext *engine_ctx) {
   if (assets.light == NULL || assets.camera1 == NULL || assets.camera == NULL) {
     return false;
   }
-  if (e3d_Camera_AddTransformation(engine_ctx, assets.camera1, 0.0f,
-                                   -0.152247f, 0.209179f, 0.41079f,
+  if (e3d_Camera_AddTransformation(engine_ctx, assets.camera1, 0.0f, -0.152247f,
+                                   0.209179f, 0.41079f,
                                    CAMERA_TRANSFORM_TRANSLATE) == NULL) {
     return false;
   }
@@ -173,6 +179,28 @@ static bool scene_should_continue(void) {
 }
 
 static void render_scene_frame(e3d_EngineContext *engine_ctx) {
+  if (maggot_anim.values_count > 0u) {
+    const ModelAnimationValue *maggot_anim_frame = model_animation_get_value(
+        &maggot_anim, scene_ctx.scene_frame % maggot_anim.values_count);
+    if (maggot_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, assets.maggot1, maggot_anim_frame->w,
+          maggot_anim_frame->x, maggot_anim_frame->y, maggot_anim_frame->z,
+          MAGGOT_ANIMATION_TRANSFORM_INDEX);
+    }
+    if (maggot_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, assets.maggot2, maggot_anim_frame->w,
+          maggot_anim_frame->x, maggot_anim_frame->y, maggot_anim_frame->z,
+          MAGGOT_ANIMATION_TRANSFORM_INDEX);
+    }
+    if (maggot_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, assets.maggot3, maggot_anim_frame->w,
+          maggot_anim_frame->x, maggot_anim_frame->y, maggot_anim_frame->z,
+          MAGGOT_ANIMATION_TRANSFORM_INDEX);
+    }
+  }
   e3d_Renderer_CleanScene(engine_ctx);
   e3d_Renderer_AddModelToScene(engine_ctx, assets.earth);
   e3d_Renderer_AddModelToScene(engine_ctx, assets.moon);
@@ -207,7 +235,7 @@ static void run_scene(DemoContext *demo_ctx) {
   }
 
   for (uint32_t camera_frame = scene_ctx.scene_frame;
-       camera_frame < CAMERA_PULL_BACK_FRAMES+10 && scene_should_continue();
+       camera_frame < CAMERA_PULL_BACK_FRAMES + 10 && scene_should_continue();
        camera_frame++) {
     demo_begin_frame();
     e3d_Camera_UpdateCamera(engine_ctx, assets.camera1);
