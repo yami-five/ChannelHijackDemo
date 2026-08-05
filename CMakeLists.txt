@@ -58,7 +58,7 @@ set(EUZEBIA3D_BUILD_APP OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     Euzebia3D
     GIT_REPOSITORY https://github.com/yami-five/Euzebia3D.git
-    GIT_TAG v0.11.6
+    GIT_TAG v0.11.7
 )
 FetchContent_MakeAvailable(Euzebia3D)
 
@@ -86,6 +86,7 @@ add_executable(ChannelHijackDemo
     libs/demo_context/scenes/scene_10_alert_in.c
     libs/demo_context/scenes/scene_11_alert_out.c
     libs/demo_context/scenes/scene_12_space.c
+    libs/demo_context/scenes/scene_12_subscenes/scene_12_subscene1.c
     libs/grid/grid.c
     libs/sdl_wrapper/sdl_wrapper.c
 )
