@@ -58,7 +58,7 @@ set(EUZEBIA3D_BUILD_APP OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     Euzebia3D
     GIT_REPOSITORY https://github.com/yami-five/Euzebia3D.git
-    GIT_TAG v0.11.7
+    GIT_TAG v0.11.8
 )
 FetchContent_MakeAvailable(Euzebia3D)
 

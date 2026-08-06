@@ -170,7 +170,9 @@ def interpolate_keyframes(
 
 
 def convert_frame(
-    frame: Vector, transform_type: TransformType
+    frame: Vector,
+    transform_type: TransformType,
+    geometry_in_engine_axes: bool = False,
 ) -> ModelAnimationValue:
     """Convert one interpolated Blender value to engine w/x/y/z values."""
     if transform_type is TransformType.TRANSLATION:
@@ -178,12 +180,14 @@ def convert_frame(
         return 0.0, x, y, z
 
     if transform_type is TransformType.SCALE:
-        x, y, z = blender_scale_to_engine(frame)  # type: ignore[arg-type]
+        x, y, z = blender_scale_to_engine(  # type: ignore[arg-type]
+            frame, geometry_in_engine_axes
+        )
         return 0.0, x, y, z
 
     angle_turns, axis = blender_quaternion_to_engine_axis_angle(
         frame,  # type: ignore[arg-type]
-        geometry_in_engine_axes=True,
+        geometry_in_engine_axes=geometry_in_engine_axes,
     )
     return angle_turns * ENGINE_ROTATION_ANGLE_SCALE, *axis
 
@@ -212,16 +216,29 @@ def generate_inc_code(
     keyframes: list[Vector],
     frame_count: int,
     looped: bool = False,
+    delay: int = 0,
+    geometry_in_engine_axes: bool = False,
 ) -> str:
     """Generate ModelAnimation declarations ready to paste into an .inc file."""
     name = name.strip()
     if not _C_IDENTIFIER_PATTERN.fullmatch(name):
         raise ValueError("Name must be a valid C identifier.")
+    if delay < 0:
+        raise ValueError("Delay cannot be negative.")
 
     frames = interpolate_keyframes(keyframes, frame_count, transform_type)
     if looped:
         frames.extend(frames[-2:0:-1])
-    values = [convert_frame(frame, transform_type) for frame in frames]
+    if len(frames) + delay > MAX_OUTPUT_FRAMES:
+        raise ValueError(
+            f"The animation cannot contain more than {MAX_OUTPUT_FRAMES} frames "
+            "including delay."
+        )
+    frames = [frames[0]] * delay + frames
+    values = [
+        convert_frame(frame, transform_type, geometry_in_engine_axes)
+        for frame in frames
+    ]
     if transform_type is TransformType.ROTATION:
         values = _preserve_rotation_axis(values)
     values_name = f"{name}_values"
@@ -293,6 +310,15 @@ def run_gui() -> int:
             )
             form.addRow("Transform type:", self.transform_type_input)
 
+            self.geometry_axes_input = QComboBox()
+            self.geometry_axes_input.addItem("Blender (Z up)", False)
+            self.geometry_axes_input.addItem("Engine (Y up)", True)
+            self.geometry_axes_input.setToolTip(
+                "Coordinate system used by vertices in the exported OBJ. "
+                "Use the same value as OBJ axes in Euzebia3D Transform Copier."
+            )
+            form.addRow("OBJ axes:", self.geometry_axes_input)
+
             self.name_input = QLineEdit("model_animation")
             self.name_input.setPlaceholderText("Valid C identifier")
             form.addRow("Animation name:", self.name_input)
@@ -301,6 +327,15 @@ def run_gui() -> int:
             self.frame_count_input.setRange(1, MAX_OUTPUT_FRAMES)
             self.frame_count_input.setValue(30)
             form.addRow("Frame count:", self.frame_count_input)
+
+            self.delay_input = QSpinBox()
+            self.delay_input.setRange(0, MAX_OUTPUT_FRAMES - 1)
+            self.delay_input.setValue(0)
+            self.delay_input.setToolTip(
+                "Add this many copies of the first calculated frame at the "
+                "beginning of the animation."
+            )
+            form.addRow("Delay (frames):", self.delay_input)
 
             self.looped_input = QCheckBox()
             self.looped_input.setToolTip(
@@ -372,6 +407,10 @@ def run_gui() -> int:
                     keyframes,
                     self.frame_count_input.value(),
                     looped=self.looped_input.isChecked(),
+                    delay=self.delay_input.value(),
+                    geometry_in_engine_axes=bool(
+                        self.geometry_axes_input.currentData()
+                    ),
                 )
             except ValueError as exc:
                 QMessageBox.warning(self, "Invalid input", str(exc))
@@ -381,6 +420,7 @@ def run_gui() -> int:
             output_frame_count = self.frame_count_input.value()
             if self.looped_input.isChecked():
                 output_frame_count = max(1, output_frame_count * 2 - 2)
+            output_frame_count += self.delay_input.value()
             self.status_label.setText(
                 f"Generated {output_frame_count} frames."
             )

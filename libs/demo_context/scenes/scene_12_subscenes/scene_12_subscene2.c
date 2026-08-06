@@ -8,9 +8,12 @@
 #include "model_animation.h"
 #include "storage/gfx_indices.h"
 
-#define BEETLE1_ANIMATION_TRANSFORM_INDEX 1u
-#define BEETLE2_ANIMATION_TRANSFORM_INDEX 1u
-#define SUBSCENE2_FRAMES 110u
+#define BEETLE_ANIMATION_ROTATION_INDEX 0u
+#define BEETLE_ANIMATION_TRANSLATION_INDEX 1u
+#define BEETLE3_ANIMATION_ROTATION_INDEX 1u
+#define BEETLE3_ANIMATION_TRANSLATION_INDEX 2u
+#define SUBSCENE2_FRAMES_PART1 35u
+#define SUBSCENE2_FRAMES_PART2 SUBSCENE2_FRAMES_PART1 + 80u
 
 typedef struct {
   e3d_Mesh *beetle1;
@@ -48,7 +51,7 @@ load_assets_subscene2(e3d_EngineContext *engine_ctx, SpaceSceneAssets *assets,
       engine_ctx, GFX_TEXTURE_BEETLE2, 0.0f, 0.0f, true);
   subscene_assets->beetle2 = e3d_Mesh_CreateMesh(
       engine_ctx, subscene_assets->beetle_material2, GFX_MODEL_BEETLE2);
-  if (subscene_assets->beetle_material1 == NULL ||
+  if (subscene_assets->beetle_material2 == NULL ||
       subscene_assets->beetle2 == NULL ||
       !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->beetle2,
                                   0.6966059f, -0.0053153f, -0.7374136f,
@@ -62,12 +65,15 @@ load_assets_subscene2(e3d_EngineContext *engine_ctx, SpaceSceneAssets *assets,
   subscene_assets->beetle_material3 = e3d_Material_CreateTexturedMat(
       engine_ctx, GFX_TEXTURE_BEETLE2, 0.0f, 0.0f, true);
   subscene_assets->beetle3 = e3d_Mesh_CreateMesh(
-      engine_ctx, subscene_assets->beetle_material2, GFX_MODEL_BEETLE2);
-  if (subscene_assets->beetle_material1 == NULL ||
+      engine_ctx, subscene_assets->beetle_material3, GFX_MODEL_BEETLE2);
+  if (subscene_assets->beetle_material3 == NULL ||
       subscene_assets->beetle3 == NULL ||
-      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->beetle3, 0.1074575f,
-                        -0.9937154f, -0.1087305f, 0.0265969f,
-                        MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->beetle3,
+                                  0.3550314f, 1.0f, 0.0f, 0.0f,
+                                  MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->beetle3,
+                                  0.1074575f, -0.9937154f, -0.1087305f,
+                                  0.0265969f, MODEL_TRANSFORM_ROTATE) ||
       !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->beetle3, 0.0f,
                                   0.0f, 0.0f, 0.0f,
                                   MODEL_TRANSFORM_TRANSLATE)) {
@@ -80,11 +86,11 @@ load_assets_subscene2(e3d_EngineContext *engine_ctx, SpaceSceneAssets *assets,
   if (subscene_assets->camera == NULL) {
     return false;
   }
-  if (e3d_Camera_AddTransformation(engine_ctx, subscene_assets->camera, 0.0f,
-                                   -0.152247f, 0.209179f, 0.41079f,
-                                   CAMERA_TRANSFORM_TRANSLATE) == NULL) {
-    return false;
-  }
+  // if (e3d_Camera_AddTransformation(engine_ctx, subscene_assets->camera, 0.0f,
+  //                                  -0.152247f, 0.209179f, 0.41079f,
+  //                                  CAMERA_TRANSFORM_TRANSLATE) == NULL) {
+  //   return false;
+  // }
 
   e3d_Renderer_SetLight(engine_ctx, assets->light);
   e3d_Renderer_SetCamera(engine_ctx, subscene_assets->camera);
@@ -117,50 +123,89 @@ static bool scene_should_continue(const DemoSceneContext *scene_ctx) {
           scene_ctx->scene_frame < scene_ctx->scene_duration);
 }
 
-static void render_scene_frame(e3d_EngineContext *engine_ctx,
-                               DemoSceneContext *scene_ctx,
-                               SpaceSceneAssets *assets,
-                               subscene2Scene12Subscene2Assets *subscene_assets,
-                               uint32_t subscene_frame) {
+static void
+render_scene_frame_part1(e3d_EngineContext *engine_ctx,
+                         DemoSceneContext *scene_ctx, SpaceSceneAssets *assets,
+                         subscene2Scene12Subscene2Assets *subscene_assets,
+                         uint32_t subscene_frame) {
   if (beetle1_anim.values_count > 0u) {
     const ModelAnimationValue *beetle1_anim_frame =
         model_animation_get_value(&beetle1_anim, subscene_frame);
     if (beetle1_anim_frame != NULL) {
-      e3d_Mesh_ModifyTransformation(engine_ctx, subscene_assets->beetle1,
-                                    beetle1_anim_frame->w, beetle1_anim_frame->x,
-                                    beetle1_anim_frame->y, beetle1_anim_frame->z,
-                                    BEETLE1_ANIMATION_TRANSFORM_INDEX);
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->beetle1, beetle1_anim_frame->w,
+          beetle1_anim_frame->x, beetle1_anim_frame->y, beetle1_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
     }
   }
-  
+
   if (beetle2_anim.values_count > 0u) {
     const ModelAnimationValue *beetle2_anim_frame =
-        model_animation_get_value(&beetle2_anim, subscene_frame-5);
+        model_animation_get_value(&beetle2_anim, subscene_frame - 5);
     if (beetle2_anim_frame != NULL) {
-      e3d_Mesh_ModifyTransformation(engine_ctx, subscene_assets->beetle2,
-                                    beetle2_anim_frame->w, beetle2_anim_frame->x,
-                                    beetle2_anim_frame->y, beetle2_anim_frame->z,
-                                    BEETLE1_ANIMATION_TRANSFORM_INDEX);
-    }
-  }
-  
-  if (beetle3_anim.values_count > 0u) {
-    const ModelAnimationValue *beetle3_anim_frame =
-        model_animation_get_value(&beetle3_anim, subscene_frame-60);
-    if (beetle3_anim_frame != NULL) {
-      e3d_Mesh_ModifyTransformation(engine_ctx, subscene_assets->beetle3,
-                                    beetle3_anim_frame->w, beetle3_anim_frame->x,
-                                    beetle3_anim_frame->y, beetle3_anim_frame->z,
-                                    BEETLE1_ANIMATION_TRANSFORM_INDEX);
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->beetle2, beetle2_anim_frame->w,
+          beetle2_anim_frame->x, beetle2_anim_frame->y, beetle2_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
     }
   }
 
   e3d_Renderer_CleanScene(engine_ctx);
   e3d_Renderer_AddModelToScene(engine_ctx, assets->earth);
   // e3d_Renderer_AddModelToScene(engine_ctx, assets->moon);
-  // e3d_Renderer_AddModelToScene(engine_ctx, assets->bug);
   e3d_Renderer_AddModelToScene(engine_ctx, subscene_assets->beetle1);
   e3d_Renderer_AddModelToScene(engine_ctx, subscene_assets->beetle2);
+  for (uint32_t i = 0u; i < sizeof(starField) / sizeof(starField[0]); i++) {
+    e3d_Renderer_AddPointToScene(engine_ctx, &starField[i]);
+  }
+  e3d_Renderer_RenderScene(engine_ctx);
+  end_scene_frame(scene_ctx);
+  demo_end_frame();
+}
+
+static void
+render_scene_frame_part2(e3d_EngineContext *engine_ctx,
+                         DemoSceneContext *scene_ctx, SpaceSceneAssets *assets,
+                         subscene2Scene12Subscene2Assets *subscene_assets,
+                         uint32_t subscene_frame) {
+  if (camera_beetle_anim.values_count > 0u) {
+    const ModelAnimationValue *camera_beetle_anim_frame =
+        model_animation_get_value(&camera_beetle_anim, subscene_frame - 40);
+    if (camera_beetle_anim_frame != NULL) {
+      e3d_Camera_SetPos(
+          engine_ctx, subscene_assets->camera, camera_beetle_anim_frame->x,
+          camera_beetle_anim_frame->y, camera_beetle_anim_frame->z);
+    }
+  }
+  if (beetle3_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *beetle3_anim_translate_frame =
+        model_animation_get_value(&beetle3_anim_translate, subscene_frame - 40);
+    if (beetle3_anim_translate_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->beetle3, beetle3_anim_translate_frame->w,
+          beetle3_anim_translate_frame->x, beetle3_anim_translate_frame->y,
+          beetle3_anim_translate_frame->z, BEETLE3_ANIMATION_TRANSLATION_INDEX);
+      e3d_Camera_SetTargetPos(
+          engine_ctx, subscene_assets->camera, beetle3_anim_translate_frame->x,
+          beetle3_anim_translate_frame->y, beetle3_anim_translate_frame->z);
+      if (subscene_frame >= SUBSCENE2_FRAMES_PART1 + 5u)
+        e3d_Camera_UpdateCamera(engine_ctx, subscene_assets->camera);
+    }
+  }
+  if (beetle3_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *beetle3_anim_rotate_frame =
+        model_animation_get_value(&beetle3_anim_rotate, subscene_frame - 40);
+    if (beetle3_anim_rotate_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->beetle3, beetle3_anim_rotate_frame->w,
+          beetle3_anim_rotate_frame->x, beetle3_anim_rotate_frame->y,
+          beetle3_anim_rotate_frame->z, BEETLE3_ANIMATION_ROTATION_INDEX);
+    }
+  }
+
+  e3d_Renderer_CleanScene(engine_ctx);
+  e3d_Renderer_AddModelToScene(engine_ctx, assets->earth);
+  // e3d_Renderer_AddModelToScene(engine_ctx, assets->moon);
   e3d_Renderer_AddModelToScene(engine_ctx, subscene_assets->beetle3);
   for (uint32_t i = 0u; i < sizeof(starField) / sizeof(starField[0]); i++) {
     e3d_Renderer_AddPointToScene(engine_ctx, &starField[i]);
@@ -189,12 +234,21 @@ void scene_12_subscene2_run_scene(DemoContext *demo_ctx,
     scene_ctx->scene_start_time_ms = demo_platform_time_ms();
   }
 
-  for (uint32_t subscene_frame = 0u;
-       subscene_frame < SUBSCENE2_FRAMES && scene_should_continue(scene_ctx);
+  uint32_t subscene_frame = 0u;
+  for (; subscene_frame < SUBSCENE2_FRAMES_PART1 &&
+         scene_should_continue(scene_ctx);
        subscene_frame++) {
     demo_begin_frame();
-    render_scene_frame(engine_ctx, scene_ctx, assets, &subscene_assets,
-                       subscene_frame);
+    render_scene_frame_part1(engine_ctx, scene_ctx, assets, &subscene_assets,
+                             subscene_frame);
+  }
+
+  for (; subscene_frame < SUBSCENE2_FRAMES_PART2 &&
+         scene_should_continue(scene_ctx);
+       subscene_frame++) {
+    demo_begin_frame();
+    render_scene_frame_part2(engine_ctx, scene_ctx, assets, &subscene_assets,
+                             subscene_frame);
   }
 
   unload_assets_subscene2(engine_ctx, &subscene_assets);

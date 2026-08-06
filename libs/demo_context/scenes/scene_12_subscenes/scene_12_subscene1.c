@@ -100,11 +100,11 @@ static bool load_assets_subscene1(e3d_EngineContext *engine_ctx,
   if (subscene_assets->camera == NULL) {
     return false;
   }
-  if (e3d_Camera_AddTransformation(engine_ctx, subscene_assets->camera, 0.0f,
-                                   -0.152247f, 0.209179f, 0.41079f,
-                                   CAMERA_TRANSFORM_TRANSLATE) == NULL) {
-    return false;
-  }
+  // if (e3d_Camera_AddTransformation(engine_ctx, subscene_assets->camera, 0.0f,
+  //                                  -0.152247f, 0.209179f, 0.41079f,
+  //                                  CAMERA_TRANSFORM_TRANSLATE) == NULL) {
+  //   return false;
+  // }
 
   e3d_Renderer_SetLight(engine_ctx, assets->light);
   e3d_Renderer_SetCamera(engine_ctx, subscene_assets->camera);
@@ -156,6 +156,14 @@ static void render_scene_frame(e3d_EngineContext *engine_ctx,
           engine_ctx, subscene_assets->maggot3, maggot_anim_frame->w,
           maggot_anim_frame->x, maggot_anim_frame->y, maggot_anim_frame->z,
           MAGGOT_ANIMATION_TRANSFORM_INDEX);
+    }
+  }if (maggot_anim.values_count > 0u) {
+    const ModelAnimationValue *camera_maggots_anim_frame = model_animation_get_value(
+        &camera_maggots_anim, scene_ctx->scene_frame % camera_maggots_anim.values_count);
+    if (camera_maggots_anim_frame != NULL) {
+      e3d_Camera_SetPos(
+          engine_ctx, subscene_assets->camera,
+          camera_maggots_anim_frame->x, camera_maggots_anim_frame->y, camera_maggots_anim_frame->z);
     }
   }
 
