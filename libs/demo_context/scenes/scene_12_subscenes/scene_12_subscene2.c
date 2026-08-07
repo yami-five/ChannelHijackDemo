@@ -13,7 +13,7 @@
 #define BEETLE3_ANIMATION_ROTATION_INDEX 1u
 #define BEETLE3_ANIMATION_TRANSLATION_INDEX 2u
 #define SUBSCENE2_FRAMES_PART1 35u
-#define SUBSCENE2_FRAMES_PART2 SUBSCENE2_FRAMES_PART1 + 80u
+#define SUBSCENE2_FRAMES_PART2 SUBSCENE2_FRAMES_PART1 + 150u
 
 typedef struct {
   e3d_Mesh *beetle1;
@@ -68,9 +68,8 @@ load_assets_subscene2(e3d_EngineContext *engine_ctx, SpaceSceneAssets *assets,
       engine_ctx, subscene_assets->beetle_material3, GFX_MODEL_BEETLE2);
   if (subscene_assets->beetle_material3 == NULL ||
       subscene_assets->beetle3 == NULL ||
-      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->beetle3,
-                                  0.3550314f, 1.0f, 0.0f, 0.0f,
-                                  MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->beetle3, 0.0,
+                                  0.0f, 0.0f, 0.0f, MODEL_TRANSFORM_ROTATE) ||
       !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->beetle3,
                                   0.1074575f, -0.9937154f, -0.1087305f,
                                   0.0265969f, MODEL_TRANSFORM_ROTATE) ||
@@ -188,7 +187,8 @@ render_scene_frame_part2(e3d_EngineContext *engine_ctx,
       e3d_Camera_SetTargetPos(
           engine_ctx, subscene_assets->camera, beetle3_anim_translate_frame->x,
           beetle3_anim_translate_frame->y, beetle3_anim_translate_frame->z);
-      if (subscene_frame >= SUBSCENE2_FRAMES_PART1 + 5u)
+      if (subscene_frame >= SUBSCENE2_FRAMES_PART1 + 9u &&
+          subscene_frame < SUBSCENE2_FRAMES_PART1 + 95u)
         e3d_Camera_UpdateCamera(engine_ctx, subscene_assets->camera);
     }
   }
