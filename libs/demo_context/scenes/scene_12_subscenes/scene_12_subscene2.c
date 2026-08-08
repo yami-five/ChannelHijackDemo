@@ -13,7 +13,9 @@
 #define BEETLE3_ANIMATION_ROTATION_INDEX 1u
 #define BEETLE3_ANIMATION_TRANSLATION_INDEX 2u
 #define SUBSCENE2_FRAMES_PART1 35u
-#define SUBSCENE2_FRAMES_PART2 SUBSCENE2_FRAMES_PART1 + 150u
+#define SUBSCENE2_FRAMES_PART2 SUBSCENE2_FRAMES_PART1 + 100u
+#define CAMERA_ANIMATION_START_FRAME 40u
+#define CAMERA_MATCH_SUBSCENE3_FRAME 134u
 
 typedef struct {
   e3d_Mesh *beetle1;
@@ -23,11 +25,11 @@ typedef struct {
   e3d_Material *beetle_material2;
   e3d_Material *beetle_material3;
   e3d_Camera *camera;
-} subscene2Scene12Subscene2Assets;
+} Scene12Subscene2Assets;
 
 static bool
 load_assets_subscene2(e3d_EngineContext *engine_ctx, SpaceSceneAssets *assets,
-                      subscene2Scene12Subscene2Assets *subscene_assets) {
+                      Scene12Subscene2Assets *subscene_assets) {
   if (subscene_assets->camera != NULL) {
     return true;
   }
@@ -98,7 +100,7 @@ load_assets_subscene2(e3d_EngineContext *engine_ctx, SpaceSceneAssets *assets,
 
 static void
 unload_assets_subscene2(e3d_EngineContext *engine_ctx,
-                        subscene2Scene12Subscene2Assets *subscene_assets) {
+                        Scene12Subscene2Assets *subscene_assets) {
   e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->beetle1);
   e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->beetle2);
   e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->beetle3);
@@ -125,7 +127,7 @@ static bool scene_should_continue(const DemoSceneContext *scene_ctx) {
 static void
 render_scene_frame_part1(e3d_EngineContext *engine_ctx,
                          DemoSceneContext *scene_ctx, SpaceSceneAssets *assets,
-                         subscene2Scene12Subscene2Assets *subscene_assets,
+                         Scene12Subscene2Assets *subscene_assets,
                          uint32_t subscene_frame) {
   if (beetle1_anim.values_count > 0u) {
     const ModelAnimationValue *beetle1_anim_frame =
@@ -165,12 +167,14 @@ render_scene_frame_part1(e3d_EngineContext *engine_ctx,
 static void
 render_scene_frame_part2(e3d_EngineContext *engine_ctx,
                          DemoSceneContext *scene_ctx, SpaceSceneAssets *assets,
-                         subscene2Scene12Subscene2Assets *subscene_assets,
+                         Scene12Subscene2Assets *subscene_assets,
                          uint32_t subscene_frame) {
   if (camera_beetle_anim.values_count > 0u) {
     const ModelAnimationValue *camera_beetle_anim_frame =
-        model_animation_get_value(&camera_beetle_anim, subscene_frame - 40);
-    if (camera_beetle_anim_frame != NULL) {
+        model_animation_get_value(&camera_beetle_anim,
+                                  subscene_frame - CAMERA_ANIMATION_START_FRAME);
+    if (camera_beetle_anim_frame != NULL &&
+        subscene_frame <= CAMERA_MATCH_SUBSCENE3_FRAME) {
       e3d_Camera_SetPos(
           engine_ctx, subscene_assets->camera, camera_beetle_anim_frame->x,
           camera_beetle_anim_frame->y, camera_beetle_anim_frame->z);
@@ -178,23 +182,28 @@ render_scene_frame_part2(e3d_EngineContext *engine_ctx,
   }
   if (beetle3_anim_translate.values_count > 0u) {
     const ModelAnimationValue *beetle3_anim_translate_frame =
-        model_animation_get_value(&beetle3_anim_translate, subscene_frame - 40);
+        model_animation_get_value(&beetle3_anim_translate,
+                                  subscene_frame - CAMERA_ANIMATION_START_FRAME);
     if (beetle3_anim_translate_frame != NULL) {
       e3d_Mesh_ModifyTransformation(
           engine_ctx, subscene_assets->beetle3, beetle3_anim_translate_frame->w,
           beetle3_anim_translate_frame->x, beetle3_anim_translate_frame->y,
           beetle3_anim_translate_frame->z, BEETLE3_ANIMATION_TRANSLATION_INDEX);
-      e3d_Camera_SetTargetPos(
-          engine_ctx, subscene_assets->camera, beetle3_anim_translate_frame->x,
-          beetle3_anim_translate_frame->y, beetle3_anim_translate_frame->z);
+      if (subscene_frame <= CAMERA_MATCH_SUBSCENE3_FRAME) {
+        e3d_Camera_SetTargetPos(engine_ctx, subscene_assets->camera,
+                                beetle3_anim_translate_frame->x,
+                                beetle3_anim_translate_frame->y,
+                                beetle3_anim_translate_frame->z);
+      }
       if (subscene_frame >= SUBSCENE2_FRAMES_PART1 + 9u &&
-          subscene_frame < SUBSCENE2_FRAMES_PART1 + 95u)
+          subscene_frame <= CAMERA_MATCH_SUBSCENE3_FRAME)
         e3d_Camera_UpdateCamera(engine_ctx, subscene_assets->camera);
     }
   }
   if (beetle3_anim_rotate.values_count > 0u) {
     const ModelAnimationValue *beetle3_anim_rotate_frame =
-        model_animation_get_value(&beetle3_anim_rotate, subscene_frame - 40);
+        model_animation_get_value(&beetle3_anim_rotate,
+                                  subscene_frame - CAMERA_ANIMATION_START_FRAME);
     if (beetle3_anim_rotate_frame != NULL) {
       e3d_Mesh_ModifyTransformation(
           engine_ctx, subscene_assets->beetle3, beetle3_anim_rotate_frame->w,
@@ -224,7 +233,7 @@ void scene_12_subscene2_run_scene(DemoContext *demo_ctx,
   }
 
   e3d_EngineContext *engine_ctx = demo_ctx->engine_ctx;
-  subscene2Scene12Subscene2Assets subscene_assets = {0};
+  Scene12Subscene2Assets subscene_assets = {0};
   if (!load_assets_subscene2(engine_ctx, assets, &subscene_assets)) {
     unload_assets_subscene2(engine_ctx, &subscene_assets);
     return;

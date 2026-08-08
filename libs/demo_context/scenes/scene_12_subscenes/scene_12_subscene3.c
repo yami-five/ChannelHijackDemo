@@ -8,6 +8,9 @@
 #include "model_animation.h"
 #include "storage/gfx_indices.h"
 
+#define BEETLE_ANIMATION_ROTATION_INDEX 0u
+#define BEETLE_ANIMATION_TRANSLATION_INDEX 1u
+
 typedef struct {
   e3d_Mesh *big_beetle_part1;
   e3d_Mesh *big_beetle_part2;
@@ -21,11 +24,11 @@ typedef struct {
   e3d_Mesh *big_beetle_part10;
   e3d_Material *big_beetle_material;
   e3d_Camera *camera;
-} subscene2Scene12Subscene2Assets;
+} Scene12Subscene3Assets;
 
-static bool
-load_assets_subscene3(e3d_EngineContext *engine_ctx, SpaceSceneAssets *assets,
-                      subscene2Scene12Subscene2Assets *subscene_assets) {
+static bool load_assets_subscene3(e3d_EngineContext *engine_ctx,
+                                  SpaceSceneAssets *assets,
+                                  Scene12Subscene3Assets *subscene_assets) {
   if (subscene_assets->camera != NULL) {
     return true;
   }
@@ -154,8 +157,8 @@ load_assets_subscene3(e3d_EngineContext *engine_ctx, SpaceSceneAssets *assets,
   }
 
   subscene_assets->camera = e3d_Camera_CreateCamera(
-      engine_ctx, -1.5716472f, -1.5573962f, 21.4340439f, -1.5983772f,
-      -1.6728553f, 20.4410915f, 0.0f, 1.0f, 0.0f);
+      engine_ctx, 5.3710976f, -2.2729864f, 9.7624378f, 1.2879658f, 0.61832f,
+      -4.4578447f, 0.0f, 1.0f, 0.0f);
   if (subscene_assets->camera == NULL) {
     return false;
   }
@@ -170,9 +173,8 @@ load_assets_subscene3(e3d_EngineContext *engine_ctx, SpaceSceneAssets *assets,
   return true;
 }
 
-static void
-unload_assets_subscene3(e3d_EngineContext *engine_ctx,
-                        subscene2Scene12Subscene2Assets *subscene_assets) {
+static void unload_assets_subscene3(e3d_EngineContext *engine_ctx,
+                                    Scene12Subscene3Assets *subscene_assets) {
   e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->big_beetle_part1);
   e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->big_beetle_part2);
   e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->big_beetle_part3);
@@ -203,30 +205,248 @@ static bool scene_should_continue(const DemoSceneContext *scene_ctx) {
 
 static void render_scene(e3d_EngineContext *engine_ctx,
                          DemoSceneContext *scene_ctx, SpaceSceneAssets *assets,
-                         subscene2Scene12Subscene2Assets *subscene_assets,
+                         Scene12Subscene3Assets *subscene_assets,
                          uint32_t subscene_frame) {
-  // if (big_beetle_part1_anim.values_count > 0u) {
-  //   const ModelAnimationValue *big_beetle_part1_anim_frame =
-  //       model_animation_get_value(&big_beetle_part1_anim, subscene_frame);
-  //   if (big_beetle_part1_anim_frame != NULL) {
-  //     e3d_Mesh_ModifyTransformation(
-  //         engine_ctx, subscene_assets->big_beetle_part1,
-  //         big_beetle_part1_anim_frame->w, big_beetle_part1_anim_frame->x,
-  //         big_beetle_part1_anim_frame->y, big_beetle_part1_anim_frame->z,
-  //         BEETLE_ANIMATION_TRANSLATION_INDEX);
-  //   }
-  // }
-
-  // if (beetle2_anim.values_count > 0u) {
-  //   const ModelAnimationValue *beetle2_anim_frame =
-  //       model_animation_get_value(&beetle2_anim, subscene_frame - 5);
-  //   if (beetle2_anim_frame != NULL) {
-  //     e3d_Mesh_ModifyTransformation(
-  //         engine_ctx, subscene_assets->beetle2, beetle2_anim_frame->w,
-  //         beetle2_anim_frame->x, beetle2_anim_frame->y,
-  //         beetle2_anim_frame->z, BEETLE_ANIMATION_TRANSLATION_INDEX);
-  //   }
-  // }
+  if (big_beetle_part1_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part1_anim_frame =
+        model_animation_get_value(&big_beetle_part1_anim_translate,
+                                  subscene_frame);
+    if (big_beetle_part1_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part1,
+          big_beetle_part1_anim_frame->w, big_beetle_part1_anim_frame->x,
+          big_beetle_part1_anim_frame->y, big_beetle_part1_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
+    }
+  }
+  if (big_beetle_part1_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part1_anim_frame =
+        model_animation_get_value(&big_beetle_part1_anim_rotate,
+                                  subscene_frame);
+    if (big_beetle_part1_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part1,
+          big_beetle_part1_anim_frame->w, big_beetle_part1_anim_frame->x,
+          big_beetle_part1_anim_frame->y, big_beetle_part1_anim_frame->z,
+          BEETLE_ANIMATION_ROTATION_INDEX);
+    }
+  }
+  if (big_beetle_part2_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part2_anim_frame =
+        model_animation_get_value(&big_beetle_part2_anim_translate,
+                                  subscene_frame);
+    if (big_beetle_part2_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part2,
+          big_beetle_part2_anim_frame->w, big_beetle_part2_anim_frame->x,
+          big_beetle_part2_anim_frame->y, big_beetle_part2_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
+    }
+  }
+  if (big_beetle_part2_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part2_anim_frame =
+        model_animation_get_value(&big_beetle_part2_anim_rotate,
+                                  subscene_frame);
+    if (big_beetle_part2_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part2,
+          big_beetle_part2_anim_frame->w, big_beetle_part2_anim_frame->x,
+          big_beetle_part2_anim_frame->y, big_beetle_part2_anim_frame->z,
+          BEETLE_ANIMATION_ROTATION_INDEX);
+    }
+  }
+  if (big_beetle_part3_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part3_anim_frame =
+        model_animation_get_value(&big_beetle_part3_anim_translate,
+                                  subscene_frame);
+    if (big_beetle_part3_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part3,
+          big_beetle_part3_anim_frame->w, big_beetle_part3_anim_frame->x,
+          big_beetle_part3_anim_frame->y, big_beetle_part3_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
+    }
+  }
+  if (big_beetle_part3_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part3_anim_frame =
+        model_animation_get_value(&big_beetle_part3_anim_rotate,
+                                  subscene_frame);
+    if (big_beetle_part3_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part3,
+          big_beetle_part3_anim_frame->w, big_beetle_part3_anim_frame->x,
+          big_beetle_part3_anim_frame->y, big_beetle_part3_anim_frame->z,
+          BEETLE_ANIMATION_ROTATION_INDEX);
+    }
+  }
+  if (big_beetle_part4_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part4_anim_frame =
+        model_animation_get_value(&big_beetle_part4_anim_translate,
+                                  subscene_frame);
+    if (big_beetle_part4_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part4,
+          big_beetle_part4_anim_frame->w, big_beetle_part4_anim_frame->x,
+          big_beetle_part4_anim_frame->y, big_beetle_part4_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
+    }
+  }
+  if (big_beetle_part4_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part4_anim_frame =
+        model_animation_get_value(&big_beetle_part4_anim_rotate,
+                                  subscene_frame);
+    if (big_beetle_part4_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part4,
+          big_beetle_part4_anim_frame->w, big_beetle_part4_anim_frame->x,
+          big_beetle_part4_anim_frame->y, big_beetle_part4_anim_frame->z,
+          BEETLE_ANIMATION_ROTATION_INDEX);
+    }
+  }
+  if (big_beetle_part5_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part5_anim_frame =
+        model_animation_get_value(&big_beetle_part5_anim_translate,
+                                  subscene_frame);
+    if (big_beetle_part5_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part5,
+          big_beetle_part5_anim_frame->w, big_beetle_part5_anim_frame->x,
+          big_beetle_part5_anim_frame->y, big_beetle_part5_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
+    }
+  }
+  if (big_beetle_part5_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part5_anim_frame =
+        model_animation_get_value(&big_beetle_part5_anim_rotate,
+                                  subscene_frame);
+    if (big_beetle_part5_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part5,
+          big_beetle_part5_anim_frame->w, big_beetle_part5_anim_frame->x,
+          big_beetle_part5_anim_frame->y, big_beetle_part5_anim_frame->z,
+          BEETLE_ANIMATION_ROTATION_INDEX);
+    }
+  }
+  if (big_beetle_part6_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part6_anim_frame =
+        model_animation_get_value(&big_beetle_part6_anim_translate,
+                                  subscene_frame);
+    if (big_beetle_part6_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part6,
+          big_beetle_part6_anim_frame->w, big_beetle_part6_anim_frame->x,
+          big_beetle_part6_anim_frame->y, big_beetle_part6_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
+    }
+  }
+  if (big_beetle_part6_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part6_anim_frame =
+        model_animation_get_value(&big_beetle_part6_anim_rotate,
+                                  subscene_frame);
+    if (big_beetle_part6_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part6,
+          big_beetle_part6_anim_frame->w, big_beetle_part6_anim_frame->x,
+          big_beetle_part6_anim_frame->y, big_beetle_part6_anim_frame->z,
+          BEETLE_ANIMATION_ROTATION_INDEX);
+    }
+  }
+  if (big_beetle_part7_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part7_anim_frame =
+        model_animation_get_value(&big_beetle_part7_anim_translate,
+                                  subscene_frame);
+    if (big_beetle_part7_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part7,
+          big_beetle_part7_anim_frame->w, big_beetle_part7_anim_frame->x,
+          big_beetle_part7_anim_frame->y, big_beetle_part7_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
+    }
+  }
+  if (big_beetle_part7_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part7_anim_frame =
+        model_animation_get_value(&big_beetle_part7_anim_rotate,
+                                  subscene_frame);
+    if (big_beetle_part7_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part7,
+          big_beetle_part7_anim_frame->w, big_beetle_part7_anim_frame->x,
+          big_beetle_part7_anim_frame->y, big_beetle_part7_anim_frame->z,
+          BEETLE_ANIMATION_ROTATION_INDEX);
+    }
+  }
+  if (big_beetle_part8_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part8_anim_frame =
+        model_animation_get_value(&big_beetle_part8_anim_translate,
+                                  subscene_frame);
+    if (big_beetle_part8_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part8,
+          big_beetle_part8_anim_frame->w, big_beetle_part8_anim_frame->x,
+          big_beetle_part8_anim_frame->y, big_beetle_part8_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
+    }
+  }
+  if (big_beetle_part8_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part8_anim_frame =
+        model_animation_get_value(&big_beetle_part8_anim_rotate,
+                                  subscene_frame);
+    if (big_beetle_part8_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part8,
+          big_beetle_part8_anim_frame->w, big_beetle_part8_anim_frame->x,
+          big_beetle_part8_anim_frame->y, big_beetle_part8_anim_frame->z,
+          BEETLE_ANIMATION_ROTATION_INDEX);
+    }
+  }
+  if (big_beetle_part9_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part9_anim_frame =
+        model_animation_get_value(&big_beetle_part9_anim_translate,
+                                  subscene_frame);
+    if (big_beetle_part9_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part9,
+          big_beetle_part9_anim_frame->w, big_beetle_part9_anim_frame->x,
+          big_beetle_part9_anim_frame->y, big_beetle_part9_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
+    }
+  }
+  if (big_beetle_part9_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part9_anim_frame =
+        model_animation_get_value(&big_beetle_part9_anim_rotate,
+                                  subscene_frame);
+    if (big_beetle_part9_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part9,
+          big_beetle_part9_anim_frame->w, big_beetle_part9_anim_frame->x,
+          big_beetle_part9_anim_frame->y, big_beetle_part9_anim_frame->z,
+          BEETLE_ANIMATION_ROTATION_INDEX);
+    }
+  }
+  if (big_beetle_part10_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part10_anim_frame =
+        model_animation_get_value(&big_beetle_part10_anim_translate,
+                                  subscene_frame);
+    if (big_beetle_part10_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part10,
+          big_beetle_part10_anim_frame->w, big_beetle_part10_anim_frame->x,
+          big_beetle_part10_anim_frame->y, big_beetle_part10_anim_frame->z,
+          BEETLE_ANIMATION_TRANSLATION_INDEX);
+    }
+  }
+  if (big_beetle_part10_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *big_beetle_part10_anim_frame =
+        model_animation_get_value(&big_beetle_part10_anim_rotate,
+                                  subscene_frame);
+    if (big_beetle_part10_anim_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->big_beetle_part10,
+          big_beetle_part10_anim_frame->w, big_beetle_part10_anim_frame->x,
+          big_beetle_part10_anim_frame->y, big_beetle_part10_anim_frame->z,
+          BEETLE_ANIMATION_ROTATION_INDEX);
+    }
+  }
 
   e3d_Renderer_CleanScene(engine_ctx);
   e3d_Renderer_AddModelToScene(engine_ctx, assets->earth);
@@ -258,7 +478,7 @@ void scene_12_subscene3_run_scene(DemoContext *demo_ctx,
   }
 
   e3d_EngineContext *engine_ctx = demo_ctx->engine_ctx;
-  subscene2Scene12Subscene2Assets subscene_assets = {0};
+  Scene12Subscene3Assets subscene_assets = {0};
   if (!load_assets_subscene3(engine_ctx, assets, &subscene_assets)) {
     unload_assets_subscene3(engine_ctx, &subscene_assets);
     return;
@@ -268,8 +488,8 @@ void scene_12_subscene3_run_scene(DemoContext *demo_ctx,
     scene_ctx->scene_start_time_ms = demo_platform_time_ms();
   }
 
-  uint32_t subscene_frame = 0u;
-  for (; subscene_frame < 10 && scene_should_continue(scene_ctx);
+  uint32_t subscene_frame = 10u;
+  for (; subscene_frame < 100 && scene_should_continue(scene_ctx);
        subscene_frame++) {
     demo_begin_frame();
     render_scene(engine_ctx, scene_ctx, assets, &subscene_assets,

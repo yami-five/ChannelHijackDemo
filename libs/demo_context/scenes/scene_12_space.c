@@ -109,7 +109,7 @@ static void run_scene(DemoContext *demo_ctx) {
 
   scene_12_subscene1_run_scene(demo_ctx, &scene_ctx, &assets);
   scene_12_subscene2_run_scene(demo_ctx, &scene_ctx, &assets);
-  // scene_12_subscene3_run_scene(demo_ctx, &scene_ctx, &assets);
+  scene_12_subscene3_run_scene(demo_ctx, &scene_ctx, &assets);
   unload_assets(demo_ctx->engine_ctx);
 }
 
