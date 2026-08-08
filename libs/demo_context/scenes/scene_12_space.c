@@ -5,6 +5,7 @@
 #include "engineApi.h"
 #include "scene_12_subscenes/scene_12_subscene1.h"
 #include "scene_12_subscenes/scene_12_subscene2.h"
+#include "scene_12_subscenes/scene_12_subscene3.h"
 #include "storage/gfx_indices.h"
 
 static void run_scene(DemoContext *demo_ctx);
@@ -108,6 +109,7 @@ static void run_scene(DemoContext *demo_ctx) {
 
   scene_12_subscene1_run_scene(demo_ctx, &scene_ctx, &assets);
   scene_12_subscene2_run_scene(demo_ctx, &scene_ctx, &assets);
+  // scene_12_subscene3_run_scene(demo_ctx, &scene_ctx, &assets);
   unload_assets(demo_ctx->engine_ctx);
 }
 

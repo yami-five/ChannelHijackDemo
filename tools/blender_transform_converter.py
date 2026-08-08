@@ -10,7 +10,7 @@ from collections.abc import Sequence
 bl_info = {
     "name": "Euzebia3D Transform Copier",
     "author": "Euzebia3D",
-    "version": (1, 4, 0),
+    "version": (1, 5, 0),
     "blender": (3, 6, 0),
     "location": "3D View > Sidebar > Euzebia3D",
     "description": "Copy object transforms and cameras as Euzebia3D C code",
@@ -324,6 +324,29 @@ def _object_name_to_c_identifier(name: str) -> str:
     return identifier
 
 
+def _object_world_matrix_recursive(obj, depsgraph):
+    """Compose an evaluated object's world matrix through all its parents."""
+    evaluated_obj = obj.evaluated_get(depsgraph)
+    if obj.parent is None:
+        return evaluated_obj.matrix_world.copy()
+
+    parent_world = _object_world_matrix_recursive(obj.parent, depsgraph)
+
+    # matrix_local is relative to an object parent. Other Blender parenting
+    # modes (for example, bone or vertex parenting) use additional parent data,
+    # so derive the evaluated relative matrix from matrix_world for those modes.
+    if obj.parent_type == "OBJECT":
+        relative_matrix = evaluated_obj.matrix_local.copy()
+    else:
+        evaluated_parent = obj.parent.evaluated_get(depsgraph)
+        relative_matrix = (
+            evaluated_parent.matrix_world.inverted_safe()
+            @ evaluated_obj.matrix_world
+        )
+
+    return parent_world @ relative_matrix
+
+
 try:
     import bpy
 except ImportError:
@@ -392,7 +415,9 @@ if bpy is not None:
                 )
                 return {"FINISHED"}
 
-            location, rotation, scale = obj.matrix_basis.decompose()
+            depsgraph = context.evaluated_depsgraph_get()
+            world_matrix = _object_world_matrix_recursive(obj, depsgraph)
+            location, rotation, scale = world_matrix.decompose()
             mesh_expression = obj.euzebia3d_mesh_expression.strip()
             if not mesh_expression:
                 mesh_expression = f"assets.{_object_name_to_c_identifier(obj.name)}"
@@ -412,7 +437,7 @@ if bpy is not None:
                 return {"CANCELLED"}
 
             context.window_manager.clipboard = snippet
-            self.report({"INFO"}, f"Copied transform for {obj.name}")
+            self.report({"INFO"}, f"Copied world transform for {obj.name}")
             return {"FINISHED"}
 
 
