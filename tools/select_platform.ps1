@@ -143,6 +143,7 @@ add_executable(ChannelHijackDemo
     libs/demo_context/scenes/scene_12_subscenes/scene_12_subscene4.c
     libs/demo_context/scenes/scene_12_subscenes/scene_12_subscene5.c
     libs/demo_context/scenes/scene_12_subscenes/scene_12_subscene6.c
+    libs/demo_context/scenes/scene_12_subscenes/scene_12_subscene7.c
     libs/grid/grid.c
     libs/sdl_wrapper/sdl_wrapper.c
 )

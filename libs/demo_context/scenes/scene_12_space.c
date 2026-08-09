@@ -9,7 +9,10 @@
 #include "scene_12_subscenes/scene_12_subscene4.h"
 #include "scene_12_subscenes/scene_12_subscene5.h"
 #include "scene_12_subscenes/scene_12_subscene6.h"
+#include "scene_12_subscenes/scene_12_subscene7.h"
 #include "storage/gfx_indices.h"
+
+#define BUG_SCALE 1.5f
 
 static void run_scene(DemoContext *demo_ctx);
 
@@ -33,12 +36,14 @@ static bool load_assets(e3d_EngineContext *engine_ctx) {
   assets.bug =
       e3d_Mesh_CreateMesh(engine_ctx, assets.bug_material, GFX_MODEL_BUG_SHIP);
   if (assets.bug_material == NULL || assets.bug == NULL ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, 2.0f, 2.0f,
-                                  2.0f, MODEL_TRANSFORM_SCALE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, BUG_SCALE, BUG_SCALE,
+                                  BUG_SCALE, MODEL_TRANSFORM_SCALE) ||
       !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, 0.0f, 0.0f,
                                   0.0f, MODEL_TRANSFORM_ROTATE) ||
-      !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, 5.0f, -1.0f,
-                                  -5.0f, MODEL_TRANSFORM_TRANSLATE)) {
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, 0.0f, 0.0f,
+                                  0.0f, MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, assets.bug, 0.0f, 0.0f, 0.0f,
+                                  0.0f, MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
 
@@ -111,12 +116,13 @@ static void run_scene(DemoContext *demo_ctx) {
     return;
   }
 
-  // scene_12_subscene1_run_scene(demo_ctx, &scene_ctx, &assets);
-  // scene_12_subscene2_run_scene(demo_ctx, &scene_ctx, &assets);
-  // scene_12_subscene3_run_scene(demo_ctx, &scene_ctx, &assets);
-  // scene_12_subscene4_run_scene(demo_ctx, &scene_ctx, &assets);
-  // scene_12_subscene5_run_scene(demo_ctx, &scene_ctx, &assets);
+  scene_12_subscene1_run_scene(demo_ctx, &scene_ctx, &assets);
+  scene_12_subscene2_run_scene(demo_ctx, &scene_ctx, &assets);
+  scene_12_subscene3_run_scene(demo_ctx, &scene_ctx, &assets);
+  scene_12_subscene4_run_scene(demo_ctx, &scene_ctx, &assets);
+  scene_12_subscene5_run_scene(demo_ctx, &scene_ctx, &assets);
   scene_12_subscene6_run_scene(demo_ctx, &scene_ctx, &assets);
+  scene_12_subscene7_run_scene(demo_ctx, &scene_ctx, &assets);
   unload_assets(demo_ctx->engine_ctx);
 }
 

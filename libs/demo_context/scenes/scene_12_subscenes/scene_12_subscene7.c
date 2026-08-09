@@ -1,4 +1,4 @@
-#include "scene_12_subscene6.h"
+#include "scene_12_subscene7.h"
 
 #include "../../demo_context.h"
 #include "../../demo_scene.h"
@@ -9,18 +9,21 @@
 #include "model_animation.h"
 #include "storage/gfx_indices.h"
 
-#define BUG_ANIMATION_ROTATION_INDEX 2u
-#define BUG_ANIMATION_TRANSLATION_INDEX 3u
+#define EARTH_ANIMATION_ROTATION_INDEX 1u
+#define ANT_ANIMATION_ROTATION_INDEX 1u
+#define ANT_ANIMATION_TRANSLATION_INDEX 2u
+#define MOON_ANIMATION_ROTATION_INDEX 2u
+#define MOON_ANIMATION_TRANSLATION_INDEX 3u
 
 typedef struct {
   e3d_Mesh *ant;
   e3d_Material *ant_material;
   e3d_Camera *camera;
-} Scene12Subscene6Assets;
+} Scene12Subscene7Assets;
 
-static bool load_assets_subscene6(e3d_EngineContext *engine_ctx,
+static bool load_assets_subscene7(e3d_EngineContext *engine_ctx,
                                   SpaceSceneAssets *assets,
-                                  Scene12Subscene6Assets *subscene_assets) {
+                                  Scene12Subscene7Assets *subscene_assets) {
   if (subscene_assets->camera != NULL) {
     return true;
   }
@@ -38,10 +41,10 @@ static bool load_assets_subscene6(e3d_EngineContext *engine_ctx,
                                   -2.0f, 0.0f, MODEL_TRANSFORM_TRANSLATE)) {
     return false;
   }
-  
+
   subscene_assets->camera = e3d_Camera_CreateCamera(
-      engine_ctx, -42.6213112f, -1.9740698f, 1.0076449f, -41.6213112f,
-      -1.9740698f, 1.0076449f, 0.0f, 1.0f, 0.0f);
+      engine_ctx, -102.7094193f, 67.0399399f, 89.346962f, -102.024025f,
+      66.5933228f, 88.771843f, 0.0f, 1.0f, 0.0f);
   if (subscene_assets->camera == NULL) {
     return false;
   }
@@ -51,8 +54,8 @@ static bool load_assets_subscene6(e3d_EngineContext *engine_ctx,
   return true;
 }
 
-static void unload_assets_subscene6(e3d_EngineContext *engine_ctx,
-                                    Scene12Subscene6Assets *subscene_assets) {
+static void unload_assets_subscene7(e3d_EngineContext *engine_ctx,
+                                    Scene12Subscene7Assets *subscene_assets) {
   e3d_Camera_DeleteCamera(engine_ctx, &subscene_assets->camera);
 }
 
@@ -70,28 +73,59 @@ static bool scene_should_continue(const DemoSceneContext *scene_ctx) {
 
 static void render_scene(e3d_EngineContext *engine_ctx,
                          DemoSceneContext *scene_ctx, SpaceSceneAssets *assets,
-                         Scene12Subscene6Assets *subscene_assets,
+                         Scene12Subscene7Assets *subscene_assets,
                          uint32_t subscene_frame) {
-  if (bug_anim_translate.values_count > 0u) {
-    const ModelAnimationValue *bug_anim_translate_frame =
-        model_animation_get_value(&bug_anim_translate, subscene_frame);
-    if (bug_anim_translate_frame != NULL) {
+  if (ant_end_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *ant_end_anim_translate_frame =
+        model_animation_get_value(&ant_end_anim_translate, subscene_frame);
+    if (ant_end_anim_translate_frame != NULL) {
       e3d_Mesh_ModifyTransformation(
-          engine_ctx, assets->bug, bug_anim_translate_frame->w,
-          bug_anim_translate_frame->x, bug_anim_translate_frame->y,
-          bug_anim_translate_frame->z, BUG_ANIMATION_TRANSLATION_INDEX);
+          engine_ctx, subscene_assets->ant, ant_end_anim_translate_frame->w,
+          ant_end_anim_translate_frame->x, ant_end_anim_translate_frame->y,
+          ant_end_anim_translate_frame->z, ANT_ANIMATION_TRANSLATION_INDEX);
     }
   }
-  if (bug_anim_rotate.values_count > 0u) {
-    const ModelAnimationValue *bug_anim_rotate_frame =
-        model_animation_get_value(&bug_anim_rotate, subscene_frame);
-    if (bug_anim_rotate_frame != NULL) {
+  if (ant_end_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *ant_end_anim_rotate_frame =
+        model_animation_get_value(&ant_end_anim_rotate, subscene_frame);
+    if (ant_end_anim_rotate_frame != NULL) {
       e3d_Mesh_ModifyTransformation(
-          engine_ctx, assets->bug, bug_anim_rotate_frame->w,
-          bug_anim_rotate_frame->x, bug_anim_rotate_frame->y,
-          bug_anim_rotate_frame->z, BUG_ANIMATION_ROTATION_INDEX);
+          engine_ctx, subscene_assets->ant, ant_end_anim_rotate_frame->w,
+          ant_end_anim_rotate_frame->x, ant_end_anim_rotate_frame->y,
+          ant_end_anim_rotate_frame->z, ANT_ANIMATION_ROTATION_INDEX);
     }
   }
+  if (moon_end_anim_translate.values_count > 0u) {
+    const ModelAnimationValue *moon_end_anim_translate_frame =
+        model_animation_get_value(&moon_end_anim_translate, subscene_frame);
+    if (moon_end_anim_translate_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, assets->moon, moon_end_anim_translate_frame->w,
+          moon_end_anim_translate_frame->x, moon_end_anim_translate_frame->y,
+          moon_end_anim_translate_frame->z, MOON_ANIMATION_TRANSLATION_INDEX);
+    }
+  }
+  if (moon_end_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *moon_end_anim_rotate_frame =
+        model_animation_get_value(&moon_end_anim_rotate, subscene_frame);
+    if (moon_end_anim_rotate_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, assets->moon, moon_end_anim_rotate_frame->w,
+          moon_end_anim_rotate_frame->x, moon_end_anim_rotate_frame->y,
+          moon_end_anim_rotate_frame->z, MOON_ANIMATION_ROTATION_INDEX);
+    }
+  }
+  if (earth_end_anim_rotate.values_count > 0u) {
+    const ModelAnimationValue *earth_end_anim_rotate_frame =
+        model_animation_get_value(&earth_end_anim_rotate, subscene_frame);
+    if (earth_end_anim_rotate_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, assets->earth, earth_end_anim_rotate_frame->w,
+          earth_end_anim_rotate_frame->x, earth_end_anim_rotate_frame->y,
+          earth_end_anim_rotate_frame->z, EARTH_ANIMATION_ROTATION_INDEX);
+    }
+  }
+
   e3d_Renderer_CleanScene(engine_ctx);
   e3d_Renderer_AddModelToScene(engine_ctx, assets->bug);
   e3d_Renderer_AddModelToScene(engine_ctx, assets->earth);
@@ -105,7 +139,7 @@ static void render_scene(e3d_EngineContext *engine_ctx,
   demo_end_frame();
 }
 
-void scene_12_subscene6_run_scene(DemoContext *demo_ctx,
+void scene_12_subscene7_run_scene(DemoContext *demo_ctx,
                                   DemoSceneContext *scene_ctx,
                                   SpaceSceneAssets *assets) {
   if (demo_ctx == NULL || demo_ctx->engine_ctx == NULL || scene_ctx == NULL ||
@@ -114,9 +148,9 @@ void scene_12_subscene6_run_scene(DemoContext *demo_ctx,
   }
 
   e3d_EngineContext *engine_ctx = demo_ctx->engine_ctx;
-  Scene12Subscene6Assets subscene_assets = {0};
-  if (!load_assets_subscene6(engine_ctx, assets, &subscene_assets)) {
-    unload_assets_subscene6(engine_ctx, &subscene_assets);
+  Scene12Subscene7Assets subscene_assets = {0};
+  if (!load_assets_subscene7(engine_ctx, assets, &subscene_assets)) {
+    unload_assets_subscene7(engine_ctx, &subscene_assets);
     return;
   }
 
@@ -132,5 +166,5 @@ void scene_12_subscene6_run_scene(DemoContext *demo_ctx,
                  subscene_frame);
   }
 
-  unload_assets_subscene6(engine_ctx, &subscene_assets);
+  unload_assets_subscene7(engine_ctx, &subscene_assets);
 }

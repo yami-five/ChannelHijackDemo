@@ -716,7 +716,7 @@ void scene_12_subscene4_run_scene(DemoContext *demo_ctx,
   }
 
   uint32_t subscene_frame = 0u;
-  for (; subscene_frame < 100 && scene_should_continue(scene_ctx);
+  for (; subscene_frame < 80 && scene_should_continue(scene_ctx);
        subscene_frame++) {
     demo_begin_frame();
     render_scene(engine_ctx, scene_ctx, assets, &subscene_assets,
