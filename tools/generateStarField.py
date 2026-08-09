@@ -8,11 +8,12 @@ import sys
 from collections.abc import Sequence
 
 
-DEFAULT_STAR_COUNT = 10000
+DEFAULT_STAR_COUNT = 1024
 DEFAULT_SHIFT = 12
 DEFAULT_ARRAY_NAME = "starField"
 DEFAULT_STAR_RGB = (255, 255, 255)
-STAR_RADIUS = 100.0
+DEFAULT_STAR_RADIUS = 100.0
+MAX_STAR_RADIUS = 1_000_000.0
 MAX_FIXED_SHIFT = 24
 MAX_STAR_COUNT = 1_000_000
 
@@ -33,6 +34,15 @@ def fixed_shift(value: str) -> int:
             f"Fixed-point shift must be between 0 and {MAX_FIXED_SHIFT}."
         )
     return shift
+
+
+def positive_star_radius(value: str) -> float:
+    radius = float(value)
+    if not math.isfinite(radius) or not 0.0 < radius <= MAX_STAR_RADIUS:
+        raise argparse.ArgumentTypeError(
+            f"Star radius must be greater than 0 and at most {MAX_STAR_RADIUS:g}."
+        )
+    return radius
 
 
 def to_c_identifier(value: str) -> str:
@@ -100,9 +110,12 @@ def float_to_fixed(value: float, shift: int) -> int:
 
 
 def generate_star_positions(
-    count: int, shift: int, rng: random.Random
+    count: int,
+    shift: int,
+    rng: random.Random,
+    radius: float = DEFAULT_STAR_RADIUS,
 ) -> list[tuple[int, int, int]]:
-    source_point = (0.0, 0.0, STAR_RADIUS)
+    source_point = (0.0, 0.0, radius)
     return [
         tuple(
             float_to_fixed(component, shift)
@@ -119,11 +132,12 @@ def format_star_field(
     array_name: str,
     shift: int,
     color_rgb: tuple[int, int, int],
+    radius: float = DEFAULT_STAR_RADIUS,
 ) -> str:
     color_rgb565 = rgb_to_rgb565(*color_rgb)
     color_literal = f"0x{color_rgb565:04x}u"
     lines = [
-        f"// {len(positions)} stars on a sphere with radius {STAR_RADIUS:.1f}, Q{shift} fixed point.",
+        f"// {len(positions)} stars on a sphere with radius {radius:g}, Q{shift} fixed point.",
         f"// Star color: RGB({color_rgb[0]}, {color_rgb[1]}, {color_rgb[2]}) = {color_literal} (RGB565).",
         f"static e3d_Point3D {array_name}[{len(positions)}] = {{",
     ]
@@ -141,18 +155,27 @@ def generate_output(
     array_name: str,
     color_rgb: tuple[int, int, int],
     seed: int | None,
+    radius: float = DEFAULT_STAR_RADIUS,
 ) -> str:
     rng = random.Random(seed)
-    positions = generate_star_positions(count=count, shift=shift, rng=rng)
+    positions = generate_star_positions(
+        count=count, shift=shift, rng=rng, radius=radius
+    )
     return format_star_field(
         positions=positions,
         array_name=to_c_identifier(array_name),
         shift=shift,
         color_rgb=color_rgb,
+        radius=radius,
     )
 
 
-def run_gui(initial_count: int, initial_shift: int, initial_seed: int | None) -> int:
+def run_gui(
+    initial_count: int,
+    initial_shift: int,
+    initial_seed: int | None,
+    initial_radius: float = DEFAULT_STAR_RADIUS,
+) -> int:
     try:
         from PySide6.QtWidgets import (
             QApplication,
@@ -164,6 +187,7 @@ def run_gui(initial_count: int, initial_shift: int, initial_seed: int | None) ->
             QMessageBox,
             QPlainTextEdit,
             QPushButton,
+            QDoubleSpinBox,
             QSpinBox,
             QVBoxLayout,
             QWidget,
@@ -193,6 +217,12 @@ def run_gui(initial_count: int, initial_shift: int, initial_seed: int | None) ->
             self.shift_input.setRange(0, MAX_FIXED_SHIFT)
             self.shift_input.setValue(initial_shift)
             form.addRow("Fixed-point shift:", self.shift_input)
+
+            self.radius_input = QDoubleSpinBox()
+            self.radius_input.setRange(0.001, MAX_STAR_RADIUS)
+            self.radius_input.setDecimals(3)
+            self.radius_input.setValue(initial_radius)
+            form.addRow("Star distance from origin:", self.radius_input)
 
             self.seed_input = QLineEdit("" if initial_seed is None else str(initial_seed))
             self.seed_input.setPlaceholderText("Optional; use the same seed to reproduce output")
@@ -233,6 +263,7 @@ def run_gui(initial_count: int, initial_shift: int, initial_seed: int | None) ->
                     array_name=self.name_input.text(),
                     color_rgb=parse_rgb(self.color_input.text()),
                     seed=seed,
+                    radius=self.radius_input.value(),
                 )
             except ValueError as exc:
                 QMessageBox.warning(self, "Invalid input", str(exc))
@@ -240,7 +271,8 @@ def run_gui(initial_count: int, initial_shift: int, initial_seed: int | None) ->
 
             self.output.setPlainText(output)
             self.status_label.setText(
-                f"Generated {self.count_input.value()} stars in Q{self.shift_input.value()} fixed point."
+                f"Generated {self.count_input.value()} stars at radius "
+                f"{self.radius_input.value():g} in Q{self.shift_input.value()} fixed point."
             )
 
         def copy_output(self) -> None:
@@ -255,13 +287,19 @@ def run_gui(initial_count: int, initial_shift: int, initial_seed: int | None) ->
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate Point3D stars by rotating (0.0, 0.0, 100.0) with random quaternions."
+        description="Generate Point3D stars by rotating (0.0, 0.0, radius) with random quaternions."
     )
     parser.add_argument(
         "count",
         nargs="?",
         type=positive_star_count,
         help="Number of stars to generate. Omit to open the PySide6 UI.",
+    )
+    parser.add_argument(
+        "--radius",
+        type=positive_star_radius,
+        default=DEFAULT_STAR_RADIUS,
+        help=f"Distance of each star from the origin (default: {DEFAULT_STAR_RADIUS:g}).",
     )
     parser.add_argument(
         "--shift",
@@ -301,6 +339,7 @@ def main() -> int:
             initial_count=DEFAULT_STAR_COUNT,
             initial_shift=args.shift,
             initial_seed=args.seed,
+            initial_radius=args.radius,
         )
 
     if args.count is None:
@@ -314,6 +353,7 @@ def main() -> int:
             array_name=args.name,
             color_rgb=args.color,
             seed=args.seed,
+            radius=args.radius,
         )
     )
     return 0

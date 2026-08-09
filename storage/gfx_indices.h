@@ -19,7 +19,8 @@ typedef enum {
   GFX_MODEL_BIG_BEETLE_PART8 = 14,
   GFX_MODEL_BIG_BEETLE_PART9 = 15,
   GFX_MODEL_BIG_BEETLE_PART10 =16,
-  GFX_MODEL_COUNT = 17,
+  GFX_MODEL_ANT = 17,
+  GFX_MODEL_COUNT = 18,
 } GfxModelIndex;
 
 typedef enum {
@@ -34,7 +35,8 @@ typedef enum {
   GFX_TEXTURE_BEETLE2 = 8,
   GFX_TEXTURE_BEETLE3 = 9,
   GFX_TEXTURE_BIG_BEETLE = 10,
-  GFX_TEXTURE_COUNT = 11,
+  GFX_TEXTURE_ANT = 11,
+  GFX_TEXTURE_COUNT = 12,
 } GfxTextureIndex;
 
 #endif

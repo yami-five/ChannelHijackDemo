@@ -1026,3 +1026,4 @@ const static e3d_Point3D starField[1024] = {
     {.point = {350836, 12066, -211045}, .color = 0xffffu},
     {.point = {81849, -266879, 299747}, .color = 0xffffu},
 };
+
