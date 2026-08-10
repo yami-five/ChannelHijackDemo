@@ -1,8 +1,6 @@
 #include "demo_context.h"
 #include "demo_scene.h"
-#include "scenes/scene_10_alert_in.h"
-#include "scenes/scene_11_alert_out.h"
-#include "scenes/scene_12_space.h"
+#include "scenes/scene_0_begin.h"
 #include "scenes/scene_1_tv_off.h"
 #include "scenes/scene_2_program_in.h"
 #include "scenes/scene_3_program_out.h"
@@ -12,6 +10,12 @@
 #include "scenes/scene_7_news_out.h"
 #include "scenes/scene_8_hijacking_in.h"
 #include "scenes/scene_9_hijacking_out.h"
+#include "scenes/scene_10_alert_in.h"
+#include "scenes/scene_11_alert_out.h"
+#include "scenes/scene_12_space.h"
+#include "scenes/scene_13_end_in.h"
+#include "scenes/scene_14_end_out.h"
+#include "scenes/scene_15_credits.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -21,16 +25,16 @@
 #include "pico/time.h"
 #endif
 
-#define DEMO_SCENES_COUNT 12u
+#define DEMO_SCENES_COUNT 16u
 
-static e3d_EngineContext engine;
+static e3d_EngineContext engine_ctx;
 static DemoSceneContext *scenes[DEMO_SCENES_COUNT];
 #if defined(PLATFORM_WINDOWS)
 static SdlApplication sdl_application;
 #endif
 
 static DemoContext demo_ctx = {
-    .engine_ctx = &engine,
+    .engine_ctx = &engine_ctx,
     .scenes = NULL,
     .scenes_count = 0u,
     .active_scene_index = 0u,
@@ -83,18 +87,22 @@ void run_demo(void) {
 #endif
   e3d_InitEngine(demo_ctx.engine_ctx);
   demo_ctx.start_time_ms = demo_platform_time_ms();
-  scenes[0] = scene_1_tv_off_get_context();
-  scenes[1] = scene_2_program_in_get_context();
-  scenes[2] = scene_3_program_out_get_context();
-  scenes[3] = scene_4_weather_in_get_context();
-  scenes[4] = scene_5_weather_out_get_context();
-  scenes[5] = scene_6_news_in_get_context();
-  scenes[6] = scene_7_news_out_get_context();
-  scenes[7] = scene_8_hijacking_in_get_context();
-  scenes[8] = scene_9_hijacking_out_get_context();
-  scenes[9] = scene_10_alert_in_get_context();
-  scenes[10] = scene_11_alert_out_get_context();
-  scenes[11] = scene_12_space_get_context();
+  scenes[0] = scene_0_begin_get_context();
+  scenes[1] = scene_1_tv_off_get_context();
+  scenes[2] = scene_2_program_in_get_context();
+  scenes[3] = scene_3_program_out_get_context();
+  scenes[4] = scene_4_weather_in_get_context();
+  scenes[5] = scene_5_weather_out_get_context();
+  scenes[6] = scene_6_news_in_get_context();
+  scenes[7] = scene_7_news_out_get_context();
+  scenes[8] = scene_8_hijacking_in_get_context();
+  scenes[9] = scene_9_hijacking_out_get_context();
+  scenes[10] = scene_10_alert_in_get_context();
+  scenes[11] = scene_11_alert_out_get_context();
+  scenes[12] = scene_12_space_get_context();
+  scenes[13] = scene_13_end_in_get_context();
+  scenes[14] = scene_14_end_out_get_context();
+  scenes[15] = scene_15_credits_get_context();
   demo_ctx.scenes_count = DEMO_SCENES_COUNT;
   demo_ctx.scenes = scenes;
 

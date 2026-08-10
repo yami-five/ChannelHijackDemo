@@ -2,6 +2,7 @@
 #define SCENE_TV_H
 
 #include "engineApi.h"
+#include "storage/sprites._indices.h"
 
 typedef struct {
   const e3d_Sprite *right;
@@ -14,9 +15,9 @@ static inline void scene_tv_frame_load(SceneTvFrame *frame,
   if (frame->right != NULL) {
     return;
   }
-  frame->right = engine_ctx->storage->get_sprite(1u);
-  frame->top = engine_ctx->storage->get_sprite(2u);
-  frame->left = engine_ctx->storage->get_sprite(3u);
+  frame->right = engine_ctx->storage->get_sprite(SPRITE_TV_BIG_FRAME1);
+  frame->top = engine_ctx->storage->get_sprite(SPRITE_TV_BIG_FRAME2);
+  frame->left = engine_ctx->storage->get_sprite(SPRITE_TV_BIG_FRAME3);
 }
 
 static inline void scene_tv_frame_draw(const SceneTvFrame *frame,

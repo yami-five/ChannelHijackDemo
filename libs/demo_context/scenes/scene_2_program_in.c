@@ -4,6 +4,7 @@
 #include "grid.h"
 #include "scene_tv.h"
 #include "storage/gfx_indices.h"
+#include "storage/sprites._indices.h"
 
 typedef struct {
   const e3d_Sprite *segment_zero;
@@ -49,9 +50,9 @@ static void load_assets(e3d_EngineContext *engine_ctx) {
     return;
   }
 
-  assets.segment_zero = engine_ctx->storage->get_sprite(24u);
-  assets.segment_one = engine_ctx->storage->get_sprite(25u);
-  assets.logo = engine_ctx->storage->get_sprite(50u);
+  assets.segment_zero = engine_ctx->storage->get_sprite(SPRITE_SEG_0);
+  assets.segment_one = engine_ctx->storage->get_sprite(SPRITE_SEG_1);
+  assets.logo = engine_ctx->storage->get_sprite(SPRITE_LOGO_CHANNEL1);
 }
 
 static void end_scene_frame(void) {

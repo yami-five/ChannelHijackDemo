@@ -110,9 +110,10 @@ static void run_scene(DemoContext *demo_ctx) {
   if (demo_ctx == NULL || demo_ctx->engine_ctx == NULL) {
     return;
   }
+  e3d_EngineContext *engine_ctx = demo_ctx->engine_ctx;
 
-  if (!load_assets(demo_ctx->engine_ctx)) {
-    unload_assets(demo_ctx->engine_ctx);
+  if (!load_assets(engine_ctx)) {
+    unload_assets(engine_ctx);
     return;
   }
 
@@ -123,7 +124,7 @@ static void run_scene(DemoContext *demo_ctx) {
   scene_12_subscene5_run_scene(demo_ctx, &scene_ctx, &assets);
   scene_12_subscene6_run_scene(demo_ctx, &scene_ctx, &assets);
   scene_12_subscene7_run_scene(demo_ctx, &scene_ctx, &assets);
-  unload_assets(demo_ctx->engine_ctx);
+  unload_assets(engine_ctx);
 }
 
 DemoSceneContext *scene_12_space_get_context(void) { return &scene_ctx; }

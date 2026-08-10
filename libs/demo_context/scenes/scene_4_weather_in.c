@@ -3,9 +3,10 @@
 #include "scene_4_weather_in.h"
 #include "scene_tv.h"
 #include "storage/gfx_indices.h"
+#include "storage/sprites._indices.h"
 
 typedef struct {
-  uint8_t sprite_index;
+  SpriteIndex sprite_index;
   int16_t x;
   int16_t y;
   const e3d_Sprite *sprite;
@@ -26,24 +27,38 @@ static const e3d_Sprite *logo;
 static e3d_Puppet *weather_presenter;
 static SceneTvFrame tv_frame;
 static WeatherMarker markers[] = {
-    {4u, 66, 70, NULL},  {4u, 77, 88, NULL},  {4u, 82, 112, NULL},
-    {4u, 108, 136, NULL},{4u, 106, 100, NULL},{5u, 126, 76, NULL},
-    {5u, 134, 35, NULL}, {5u, 169, 56, NULL}, {5u, 212, 47, NULL},
-    {5u, 214, 75, NULL}, {6u, 150, 114, NULL},{6u, 178, 100, NULL},
-    {6u, 142, 154, NULL},{6u, 204, 128, NULL},{6u, 158, 160, NULL},
-    {6u, 193, 160, NULL},{7u, 100, 55, NULL}, {7u, 174, 33, NULL},
-    {7u, 52, 112, NULL}, {8u, 114, 184, NULL},{8u, 178, 140, NULL},
-    {8u, 244, 124, NULL},
+    {SPRITE_WEATHER_1, 66, 70, NULL},
+    {SPRITE_WEATHER_1, 77, 88, NULL},
+    {SPRITE_WEATHER_1, 82, 112, NULL},
+    {SPRITE_WEATHER_1, 108, 136, NULL},
+    {SPRITE_WEATHER_1, 106, 100, NULL},
+    {SPRITE_WEATHER_2, 126, 76, NULL},
+    {SPRITE_WEATHER_2, 134, 35, NULL},
+    {SPRITE_WEATHER_2, 169, 56, NULL},
+    {SPRITE_WEATHER_2, 212, 47, NULL},
+    {SPRITE_WEATHER_2, 214, 75, NULL},
+    {SPRITE_WEATHER_3, 150, 114, NULL},
+    {SPRITE_WEATHER_3, 178, 100, NULL},
+    {SPRITE_WEATHER_3, 142, 154, NULL},
+    {SPRITE_WEATHER_3, 204, 128, NULL},
+    {SPRITE_WEATHER_3, 158, 160, NULL},
+    {SPRITE_WEATHER_3, 193, 160, NULL},
+    {SPRITE_WEATHER_4, 100, 55, NULL},
+    {SPRITE_WEATHER_4, 174, 33, NULL},
+    {SPRITE_WEATHER_4, 52, 112, NULL},
+    {SPRITE_WEATHER_5, 114, 184, NULL},
+    {SPRITE_WEATHER_5, 178, 140, NULL},
+    {SPRITE_WEATHER_5, 244, 124, NULL},
 };
 static uint16_t noise_colors[] = {0xffff, 0xad75, 0x5acb, 0x0000};
 static e3d_Rectangle plasma_rect = {28, 44, 182, 242};
 
 static void load_assets(e3d_EngineContext *engine_ctx) {
   if (map != NULL) return;
-  map = engine_ctx->storage->get_sprite(0u);
-  segment_zero = engine_ctx->storage->get_sprite(24u);
-  segment_two = engine_ctx->storage->get_sprite(26u);
-  logo = engine_ctx->storage->get_sprite(51u);
+  map = engine_ctx->storage->get_sprite(SPRITE_MAP);
+  segment_zero = engine_ctx->storage->get_sprite(SPRITE_SEG_0);
+  segment_two = engine_ctx->storage->get_sprite(SPRITE_SEG_2);
+  logo = engine_ctx->storage->get_sprite(SPRITE_LOGO_CHANNEL2);
   weather_presenter = e3d_Puppetteer_CreatePuppet(engine_ctx, 0u);
   for (uint32_t i = 0u; i < sizeof(markers) / sizeof(markers[0]); i++)
     markers[i].sprite = engine_ctx->storage->get_sprite(markers[i].sprite_index);

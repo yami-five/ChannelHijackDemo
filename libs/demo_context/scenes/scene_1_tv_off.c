@@ -4,6 +4,7 @@
 #include "animation.h"
 #include "fpa.h"
 #include "storage/gfx_indices.h"
+#include "storage/sprites._indices.h"
 
 #define CURTAIN_LENGTH 20u
 
@@ -44,16 +45,18 @@ static void load_assets(e3d_EngineContext *engine_ctx) {
     return;
   }
 
-  assets.tv_off = engine_ctx->storage->get_sprite(54u);
+  assets.tv_off = engine_ctx->storage->get_sprite(SPRITE_OFF);
 
   for (uint32_t i = 0u; i < CURTAIN_LENGTH; i++) {
-    assets.curtain[i] = engine_ctx->storage->get_sprite(37u);
+    assets.curtain[i] = engine_ctx->storage->get_sprite(SPRITE_FIRANKA);
   }
   for (uint32_t i = 0u; i < 7u; i++) {
-    assets.left_hands[i] = engine_ctx->storage->get_sprite((uint8_t)(38u + i));
+    assets.left_hands[i] =
+        engine_ctx->storage->get_sprite((uint8_t)(SPRITE_LEFT1 + i));
   }
   for (uint32_t i = 0u; i < 5u; i++) {
-    assets.right_hands[i] = engine_ctx->storage->get_sprite((uint8_t)(45u + i));
+    assets.right_hands[i] =
+        engine_ctx->storage->get_sprite((uint8_t)(SPRITE_RIGHT1 + i));
   }
 }
 
