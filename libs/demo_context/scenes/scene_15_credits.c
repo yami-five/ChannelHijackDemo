@@ -31,7 +31,7 @@ static void run_scene(DemoContext *demo_ctx) {
     for (uint8_t i = 0; i < LINES_NUMBER; i++) {
       const text_line current_line = textLines[i];
       e3d_Painter_Print(engine_ctx, current_line.text, current_line.x,
-                        current_line.y-scene_ctx.scene_frame+240, current_line.fontIndex,
+                        current_line.y-scene_ctx.scene_frame+300, current_line.fontIndex,
                         current_line.color);
     }
     end_scene_frame(&scene_ctx);
