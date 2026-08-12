@@ -13,7 +13,7 @@ static DemoSceneContext scene_ctx = {
     .scene_frame = 0u,
     .scene_elapsed_ms = 0u,
     .scene_start_time_ms = 0u,
-    .scene_duration = 1750u,
+    .scene_duration = 1800u,
     .run_scene = run_scene,
 };
 
