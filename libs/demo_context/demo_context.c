@@ -106,7 +106,7 @@ void run_demo(void) {
   demo_ctx.scenes_count = DEMO_SCENES_COUNT;
   demo_ctx.scenes = scenes;
 
-  for (demo_ctx.active_scene_index = 0u;
+  for (demo_ctx.active_scene_index = 12u;
        demo_ctx.active_scene_index < demo_ctx.scenes_count && demo_is_running();
        demo_ctx.active_scene_index++) {
     DemoSceneContext *scene =

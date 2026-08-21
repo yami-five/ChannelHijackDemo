@@ -5,7 +5,7 @@ const static text_line textLines[] = {
     {.text = "production of", .x = 93, .y = 37, .fontIndex = 2u, .color = 0xffffu},
     {.text = "ABERRATION CREATIONS", .x = 34, .y = 53, .fontIndex = 2u, .color = 0xffffu},
     {.text = "called", .x = 134, .y = 69, .fontIndex = 2u, .color = 0xffffu},
-    {.text = "SIGNAL INTRUSION", .x = 66, .y = 0, .fontIndex = 2u, .color = 0xffffu},
+    {.text = "SIGNAL INTRUSION", .x = 66, .y = 85, .fontIndex = 2u, .color = 0xffffu},
     {.text = "powerd by", .x = 106, .y = 101, .fontIndex = 2u, .color = 0xffffu},
     {.text = "EUZEBIA3D", .x = 108, .y = 117, .fontIndex = 2u, .color = 0xffffu},
     {.text = "First presented at", .x = 68, .y = 133, .fontIndex = 2u, .color = 0xffffu},

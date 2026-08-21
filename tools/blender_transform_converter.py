@@ -10,7 +10,7 @@ from collections.abc import Sequence
 bl_info = {
     "name": "Euzebia3D Transform Copier",
     "author": "Euzebia3D",
-    "version": (1, 5, 0),
+    "version": (1, 5, 1),
     "blender": (3, 6, 0),
     "location": "3D View > Sidebar > Euzebia3D",
     "description": "Copy object transforms and cameras as Euzebia3D C code",
@@ -359,7 +359,34 @@ if bpy is not None:
     TRACKING_CONSTRAINT_TYPES = {"TRACK_TO", "DAMPED_TRACK", "LOCKED_TRACK"}
 
 
-    def _camera_target(obj):
+    def _fresh_depsgraph(context, obj):
+        """Force a new transform evaluation for the object and its dependencies."""
+        pending = [obj]
+        tagged = set()
+        while pending:
+            dependency = pending.pop()
+            dependency_key = dependency.as_pointer()
+            if dependency_key in tagged:
+                continue
+
+            tagged.add(dependency_key)
+            dependency.update_tag(refresh={"OBJECT"})
+            if dependency.parent is not None:
+                pending.append(dependency.parent)
+            pending.extend(
+                constraint.target
+                for constraint in dependency.constraints
+                if constraint.target is not None
+            )
+
+        context.view_layer.update()
+        depsgraph = context.evaluated_depsgraph_get()
+        depsgraph.update()
+        return depsgraph
+
+
+    def _camera_target(obj, depsgraph):
+        evaluated_obj = obj.evaluated_get(depsgraph)
         for constraint in obj.constraints:
             if (
                 constraint.type in TRACKING_CONSTRAINT_TYPES
@@ -368,11 +395,13 @@ if bpy is not None:
                 and constraint.target is not None
             ):
                 return constraint.target, tuple(
-                    constraint.target.matrix_world.translation
+                    constraint.target.evaluated_get(
+                        depsgraph
+                    ).matrix_world.translation
                 )
 
-        camera_location = obj.matrix_world.translation
-        camera_forward = obj.matrix_world.to_quaternion() @ Vector(
+        camera_location = evaluated_obj.matrix_world.translation
+        camera_forward = evaluated_obj.matrix_world.to_quaternion() @ Vector(
             (0.0, 0.0, -1.0)
         )
         return None, tuple(camera_location + camera_forward)
@@ -392,6 +421,7 @@ if bpy is not None:
 
         def execute(self, context):
             obj = context.active_object
+            depsgraph = _fresh_depsgraph(context, obj)
             if obj.type == "CAMERA":
                 camera_expression = obj.euzebia3d_camera_expression.strip()
                 if not camera_expression:
@@ -399,10 +429,11 @@ if bpy is not None:
                         f"assets.{_object_name_to_c_identifier(obj.name)}"
                     )
 
-                target, target_location = _camera_target(obj)
+                evaluated_obj = obj.evaluated_get(depsgraph)
+                target, target_location = _camera_target(obj, depsgraph)
                 snippet = generate_camera_c_snippet(
                     camera=camera_expression,
-                    location=tuple(obj.matrix_world.translation),
+                    location=tuple(evaluated_obj.matrix_world.translation),
                     target_location=target_location,
                 )
                 context.window_manager.clipboard = snippet
@@ -415,7 +446,6 @@ if bpy is not None:
                 )
                 return {"FINISHED"}
 
-            depsgraph = context.evaluated_depsgraph_get()
             world_matrix = _object_world_matrix_recursive(obj, depsgraph)
             location, rotation, scale = world_matrix.decompose()
             mesh_expression = obj.euzebia3d_mesh_expression.strip()
@@ -463,7 +493,8 @@ if bpy is not None:
                         f"assets.{_object_name_to_c_identifier(obj.name)}"
                     )
                     layout.label(text=f"Default: {default_camera}")
-                target, _ = _camera_target(obj)
+                depsgraph = context.evaluated_depsgraph_get()
+                target, _ = _camera_target(obj, depsgraph)
                 if target is not None:
                     layout.label(text=f"Target: {target.name}")
                 else:

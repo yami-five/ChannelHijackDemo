@@ -117,12 +117,12 @@ static void run_scene(DemoContext *demo_ctx) {
     return;
   }
 
-  scene_12_subscene1_run_scene(demo_ctx, &scene_ctx, &assets);
-  scene_12_subscene2_run_scene(demo_ctx, &scene_ctx, &assets);
-  scene_12_subscene3_run_scene(demo_ctx, &scene_ctx, &assets);
-  scene_12_subscene4_run_scene(demo_ctx, &scene_ctx, &assets);
-  scene_12_subscene5_run_scene(demo_ctx, &scene_ctx, &assets);
-  scene_12_subscene6_run_scene(demo_ctx, &scene_ctx, &assets);
+  // scene_12_subscene1_run_scene(demo_ctx, &scene_ctx, &assets);
+  // scene_12_subscene2_run_scene(demo_ctx, &scene_ctx, &assets);
+  // scene_12_subscene3_run_scene(demo_ctx, &scene_ctx, &assets);
+  // scene_12_subscene4_run_scene(demo_ctx, &scene_ctx, &assets);
+  // scene_12_subscene5_run_scene(demo_ctx, &scene_ctx, &assets);
+  // scene_12_subscene6_run_scene(demo_ctx, &scene_ctx, &assets);
   scene_12_subscene7_run_scene(demo_ctx, &scene_ctx, &assets);
   unload_assets(engine_ctx);
 }

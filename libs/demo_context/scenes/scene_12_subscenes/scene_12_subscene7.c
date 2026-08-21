@@ -8,16 +8,22 @@
 #include "mesh.h"
 #include "model_animation.h"
 #include "storage/gfx_indices.h"
+#include <stdbool.h>
 
 #define EARTH_ANIMATION_ROTATION_INDEX 1u
 #define ANT_ANIMATION_ROTATION_INDEX 1u
 #define ANT_ANIMATION_TRANSLATION_INDEX 2u
 #define MOON_ANIMATION_ROTATION_INDEX 2u
 #define MOON_ANIMATION_TRANSLATION_INDEX 3u
+#define WASP_PARTS_ANIM_INDEX 1u
 
 typedef struct {
   e3d_Mesh *ant;
   e3d_Material *ant_material;
+  e3d_Mesh *wasp_body;
+  e3d_Mesh *wasp_planet;
+  e3d_Mesh *wasp_wing_left;
+  e3d_Mesh *wasp_wing_right;
   e3d_Camera *camera;
 } Scene12Subscene7Assets;
 
@@ -42,12 +48,69 @@ static bool load_assets_subscene7(e3d_EngineContext *engine_ctx,
     return false;
   }
 
+  subscene_assets->wasp_body = e3d_Mesh_CreateMesh(
+      engine_ctx, assets->bug_material, GFX_MODEL_WASP_BODY);
+  if (subscene_assets->wasp_body == NULL ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_body, 0.0f,
+                                  1.5f, 1.5f, 1.5f, MODEL_TRANSFORM_SCALE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_body, 0.1942613f,
+                        0.0000001f, 1.0f, -0.0000001f,
+                        MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_body, 0.0f,
+                        5.7514029f, 0.0f, 6.8739777f,
+                        MODEL_TRANSFORM_TRANSLATE)) {
+    return false;
+  }
+
+  subscene_assets->wasp_planet = e3d_Mesh_CreateMesh(
+      engine_ctx, assets->bug_material, GFX_MODEL_WASP_PLANET);
+  if (subscene_assets->wasp_planet == NULL ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_planet, 0.0f,
+                                  1.5f, 1.5f, 1.5f, MODEL_TRANSFORM_SCALE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_planet, 0.5305918f,
+                        0.2915291f, 0.9468529f, 0.1359423f,
+                        MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_planet, 0.0f,
+                        5.5626192f, 3.8773825f, 6.6489959f,
+                        MODEL_TRANSFORM_TRANSLATE)) {
+    return false;
+  }
+
+  subscene_assets->wasp_wing_left = e3d_Mesh_CreateMesh(
+      engine_ctx, assets->bug_material, GFX_MODEL_WASP_WING_LEFT);
+  if (subscene_assets->wasp_wing_left == NULL ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_wing_left, 0.0f,
+                                  1.5f, 1.5f, 1.5f, MODEL_TRANSFORM_SCALE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_wing_left, 0.1942614f,
+                        0.0000001f, 1.0f, 0.0f,
+                        MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_wing_left, 0.0f,
+                        6.6569185f, -0.7998634f, 9.9755697f,
+                        MODEL_TRANSFORM_TRANSLATE)) {
+    return false;
+  }
+  
+  subscene_assets->wasp_wing_right = e3d_Mesh_CreateMesh(
+      engine_ctx, assets->bug_material, GFX_MODEL_WASP_WING_RIGHT);
+  if (subscene_assets->wasp_wing_right == NULL ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_wing_right, 0.0f,
+                                  1.5f, 1.5f, 1.5f, MODEL_TRANSFORM_SCALE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_wing_right, 0.1942614f,
+                        0.0000001f, 1.0f, 0.0f,
+                        MODEL_TRANSFORM_ROTATE) ||
+      !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->wasp_wing_right, 0.0f,
+                        8.648634f, -0.7998639f, 8.3043232f,
+                        MODEL_TRANSFORM_TRANSLATE)) {
+    return false;
+  }
+  
   subscene_assets->camera = e3d_Camera_CreateCamera(
       engine_ctx, -102.7094193f, 67.0399399f, 89.346962f, -102.024025f,
       66.5933228f, 88.771843f, 0.0f, 1.0f, 0.0f);
   if (subscene_assets->camera == NULL) {
     return false;
   }
+  
 
   e3d_Renderer_SetLight(engine_ctx, assets->light);
   e3d_Renderer_SetCamera(engine_ctx, subscene_assets->camera);
@@ -125,9 +188,43 @@ static void render_scene(e3d_EngineContext *engine_ctx,
           earth_end_anim_rotate_frame->z, EARTH_ANIMATION_ROTATION_INDEX);
     }
   }
+  if (wasp_planet_rotate.values_count > 0u) {
+    const ModelAnimationValue *wasp_planet_rotate_frame =
+        model_animation_get_value(&wasp_planet_rotate, subscene_frame);
+    if (wasp_planet_rotate_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->wasp_planet, wasp_planet_rotate_frame->w,
+          wasp_planet_rotate_frame->x, wasp_planet_rotate_frame->y,
+          wasp_planet_rotate_frame->z, WASP_PARTS_ANIM_INDEX);
+    }
+  }
+  if (wasp_wing_left_rotate.values_count > 0u) {
+    const ModelAnimationValue *wasp_wing_left_rotate_frame =
+        model_animation_get_value(&wasp_wing_left_rotate, subscene_frame);
+    if (wasp_wing_left_rotate_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->wasp_wing_left, wasp_wing_left_rotate_frame->w,
+          wasp_wing_left_rotate_frame->x, wasp_wing_left_rotate_frame->y,
+          wasp_wing_left_rotate_frame->z, WASP_PARTS_ANIM_INDEX);
+    }
+  }
+  if (wasp_wing_right_rotate.values_count > 0u) {
+    const ModelAnimationValue *wasp_wing_right_rotate_frame =
+        model_animation_get_value(&wasp_wing_right_rotate, subscene_frame);
+    if (wasp_wing_right_rotate_frame != NULL) {
+      e3d_Mesh_ModifyTransformation(
+          engine_ctx, subscene_assets->wasp_wing_right, wasp_wing_right_rotate_frame->w,
+          wasp_wing_right_rotate_frame->x, wasp_wing_right_rotate_frame->y,
+          wasp_wing_right_rotate_frame->z, WASP_PARTS_ANIM_INDEX);
+    }
+  }
 
   e3d_Renderer_CleanScene(engine_ctx);
-  e3d_Renderer_AddModelToScene(engine_ctx, assets->bug);
+  // e3d_Renderer_AddModelToScene(engine_ctx, assets->bug);
+  e3d_Renderer_AddModelToScene(engine_ctx, subscene_assets->wasp_body);
+  e3d_Renderer_AddModelToScene(engine_ctx, subscene_assets->wasp_planet);
+  e3d_Renderer_AddModelToScene(engine_ctx, subscene_assets->wasp_wing_left);
+  e3d_Renderer_AddModelToScene(engine_ctx, subscene_assets->wasp_wing_right);
   e3d_Renderer_AddModelToScene(engine_ctx, assets->earth);
   e3d_Renderer_AddModelToScene(engine_ctx, assets->moon);
   e3d_Renderer_AddModelToScene(engine_ctx, subscene_assets->ant);
