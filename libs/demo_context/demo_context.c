@@ -18,6 +18,7 @@
 #include "scenes/scene_15_credits.h"
 #include <stdbool.h>
 #include <stdint.h>
+#include "pico/multicore.h"
 
 #if defined(PLATFORM_WINDOWS)
 #include <windows.h>
@@ -45,6 +46,8 @@ static DemoContext demo_ctx = {
     .sdlApp = &sdl_application,
 #endif
 };
+
+static void core1_main();
 
 uint32_t demo_platform_time_ms(void) {
 #if defined(PLATFORM_WINDOWS)
@@ -106,6 +109,7 @@ void run_demo(void) {
   demo_ctx.scenes_count = DEMO_SCENES_COUNT;
   demo_ctx.scenes = scenes;
 
+  multicore_launch_core1(core1_main);
   for (demo_ctx.active_scene_index = 0u;
        demo_ctx.active_scene_index < demo_ctx.scenes_count && demo_is_running();
        demo_ctx.active_scene_index++) {
@@ -123,3 +127,13 @@ void run_demo(void) {
   sdl_application_shutdown(demo_ctx.sdlApp);
 #endif
 }
+
+#if defined(EUZEBIA3D_PLATFORM_PICO)
+static void core1_main(void) {
+  sleep_ms(450);
+  e3d_Audio_PlayWavFile(&engine_ctx, "signal.wav");
+
+  while (true)
+    tight_loop_contents();
+}
+#endif

@@ -37,7 +37,7 @@ static bool load_assets_subscene7(e3d_EngineContext *engine_ctx,
       engine_ctx, GFX_TEXTURE_ANT, 0.0f, 0.0f, true);
   subscene_assets->ant = e3d_Mesh_CreateMesh(
       engine_ctx, subscene_assets->ant_material, GFX_MODEL_ANT);
-  if (subscene_assets->ant == NULL || subscene_assets->ant == NULL ||
+  if (subscene_assets->ant_material == NULL || subscene_assets->ant == NULL ||
       !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->ant, 0.0f,
                                   0.2127071f, 0.2127071f, 0.2127071f,
                                   MODEL_TRANSFORM_SCALE) ||
@@ -119,6 +119,13 @@ static bool load_assets_subscene7(e3d_EngineContext *engine_ctx,
 
 static void unload_assets_subscene7(e3d_EngineContext *engine_ctx,
                                     Scene12Subscene7Assets *subscene_assets) {
+  e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->ant);
+  e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->wasp_body);
+  e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->wasp_planet);
+  e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->wasp_wing_left);
+  e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->wasp_wing_right);
+
+  e3d_Material_DeleteMat(engine_ctx, &subscene_assets->ant_material);
   e3d_Camera_DeleteCamera(engine_ctx, &subscene_assets->camera);
 }
 
@@ -256,7 +263,7 @@ void scene_12_subscene7_run_scene(DemoContext *demo_ctx,
   }
 
   uint32_t subscene_frame = 0u;
-  for (; subscene_frame < 80 && scene_should_continue(scene_ctx);
+  for (; subscene_frame < 70 && scene_should_continue(scene_ctx);
        subscene_frame++) {
     demo_begin_frame();
     render_scene(engine_ctx, scene_ctx, assets, &subscene_assets,

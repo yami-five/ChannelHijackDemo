@@ -66,19 +66,19 @@ static void run_scene(DemoContext *demo_ctx) {
           scene_ctx.scene_frame < scene_ctx.scene_duration)) {
     const uint32_t frame = scene_ctx.scene_frame;
 
-  if (frame == 0u) {
-    scene_ctx.scene_start_time_ms = demo_platform_time_ms();
-  }
+    if (frame == 0u) {
+      scene_ctx.scene_start_time_ms = demo_platform_time_ms();
+    }
 
-  demo_begin_frame();
+    demo_begin_frame();
 
-  e3d_Painter_DrawImage(engine_ctx, GFX_TEXTURE_TV);
-  e3d_Painter_DrawSprite(engine_ctx, assets.tv_off, 91, 76, 0, 1);
-  draw_sprite_wave(engine_ctx, assets.curtain, CURTAIN_LENGTH, frame,
-                   &curtain_animation);
+    e3d_Painter_DrawImage(engine_ctx, GFX_TEXTURE_TV);
+    e3d_Painter_DrawSprite(engine_ctx, assets.tv_off, 91, 76, 0, 1);
+    draw_sprite_wave(engine_ctx, assets.curtain, CURTAIN_LENGTH, frame,
+                     &curtain_animation);
 
-  end_scene_frame();
-  demo_end_frame();
+    end_scene_frame();
+    demo_end_frame();
   }
 }
 

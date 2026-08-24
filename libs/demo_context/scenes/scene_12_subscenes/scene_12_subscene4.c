@@ -48,7 +48,7 @@ static bool load_assets_subscene4(e3d_EngineContext *engine_ctx,
       engine_ctx, GFX_TEXTURE_ANT, 0.0f, 0.0f, true);
   subscene_assets->ant = e3d_Mesh_CreateMesh(
       engine_ctx, subscene_assets->ant_material, GFX_MODEL_ANT);
-  if (subscene_assets->ant == NULL || subscene_assets->ant == NULL ||
+  if (subscene_assets->ant_material == NULL || subscene_assets->ant == NULL ||
           !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->ant, 0.0f,
                                       0.2127071f, 0.2127071f, 0.2127071f,
                                       MODEL_TRANSFORM_SCALE) ||
@@ -64,7 +64,8 @@ static bool load_assets_subscene4(e3d_EngineContext *engine_ctx,
       engine_ctx, GFX_TEXTURE_BEETLE1, 0.0f, 0.0f, true);
   subscene_assets->beetle1 = e3d_Mesh_CreateMesh(
       engine_ctx, subscene_assets->beetle_material1, GFX_MODEL_BEETLE1);
-  if (subscene_assets->beetle1 == NULL || subscene_assets->beetle1 == NULL ||
+  if (subscene_assets->beetle_material1 == NULL ||
+      subscene_assets->beetle1 == NULL ||
       !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->beetle1, 0.0f,
                                   BEETLE_SCALE, BEETLE_SCALE, BEETLE_SCALE,
                                   MODEL_TRANSFORM_SCALE) ||
@@ -80,7 +81,8 @@ static bool load_assets_subscene4(e3d_EngineContext *engine_ctx,
       engine_ctx, GFX_TEXTURE_BEETLE2, 0.0f, 0.0f, true);
   subscene_assets->beetle2 = e3d_Mesh_CreateMesh(
       engine_ctx, subscene_assets->beetle_material2, GFX_MODEL_BEETLE2);
-  if (subscene_assets->beetle2 == NULL || subscene_assets->beetle2 == NULL ||
+  if (subscene_assets->beetle_material2 == NULL ||
+      subscene_assets->beetle2 == NULL ||
       !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->beetle2, 0.0f,
                                   BEETLE_SCALE, BEETLE_SCALE, BEETLE_SCALE,
                                   MODEL_TRANSFORM_SCALE) ||
@@ -96,7 +98,8 @@ static bool load_assets_subscene4(e3d_EngineContext *engine_ctx,
       engine_ctx, GFX_TEXTURE_BEETLE3, 0.0f, 0.0f, true);
   subscene_assets->beetle3 = e3d_Mesh_CreateMesh(
       engine_ctx, subscene_assets->beetle_material3, GFX_MODEL_BEETLE3);
-  if (subscene_assets->beetle3 == NULL || subscene_assets->beetle3 == NULL ||
+  if (subscene_assets->beetle_material3 == NULL ||
+      subscene_assets->beetle3 == NULL ||
       !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->beetle3, 0.0f,
                                   BEETLE_SCALE, BEETLE_SCALE, BEETLE_SCALE,
                                   MODEL_TRANSFORM_SCALE) ||

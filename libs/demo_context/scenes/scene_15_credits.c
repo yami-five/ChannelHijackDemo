@@ -6,14 +6,14 @@
 #include "storage/gfx_indices.h"
 #include "storage/sprites._indices.h"
 
-#define LINES_NUMBER 93u
+#define LINES_NUMBER 100u
 
 static void run_scene(DemoContext *demo_ctx);
 static DemoSceneContext scene_ctx = {
     .scene_frame = 0u,
     .scene_elapsed_ms = 0u,
     .scene_start_time_ms = 0u,
-    .scene_duration = 1800u,
+    .scene_duration = 2000u,
     .run_scene = run_scene,
 };
 

@@ -27,7 +27,7 @@ static bool load_assets_subscene5(e3d_EngineContext *engine_ctx,
       engine_ctx, GFX_TEXTURE_ANT, 0.0f, 0.0f, true);
   subscene_assets->ant = e3d_Mesh_CreateMesh(
       engine_ctx, subscene_assets->ant_material, GFX_MODEL_ANT);
-  if (subscene_assets->ant == NULL || subscene_assets->ant == NULL ||
+  if (subscene_assets->ant_material == NULL || subscene_assets->ant == NULL ||
       !e3d_Mesh_AddTransformation(engine_ctx, subscene_assets->ant, 0.0f,
                                   0.2127071f, 0.2127071f, 0.2127071f,
                                   MODEL_TRANSFORM_SCALE) ||
@@ -51,6 +51,8 @@ static bool load_assets_subscene5(e3d_EngineContext *engine_ctx,
 
 static void unload_assets_subscene5(e3d_EngineContext *engine_ctx,
                                     Scene12Subscene5Assets *subscene_assets) {
+  e3d_Mesh_DeleteMesh(engine_ctx, &subscene_assets->ant);
+  e3d_Material_DeleteMat(engine_ctx, &subscene_assets->ant_material);
   e3d_Camera_DeleteCamera(engine_ctx, &subscene_assets->camera);
 }
 
